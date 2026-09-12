@@ -1006,6 +1006,15 @@ main:focus{outline:none;}
 }
 .lc-prose .kg-card figcaption a,.lc-doc-main .kg-card figcaption a{color:var(--ink);text-decoration:underline;}
 
+/* A caption belongs to the story, not to the photograph. A card that
+   has broken out of the column keeps its caption on the column's own
+   axis, so the words under a wide picture start where the words above
+   it start. Without this a full width card put its caption against the
+   left gutter, a third of the page away from the prose it belongs to.
+   Only on a story: on a document the cards fill their column already. */
+.lc-prose .kg-width-wide figcaption,
+.lc-prose .kg-width-full figcaption{width:min(100%,var(--measure));margin-inline:auto;}
+
 .lc-prose .kg-image-card img,.lc-doc-main .kg-image-card img{width:100%;}
 
 .lc-prose .kg-gallery-container,.lc-doc-main .kg-gallery-container{display:flex;flex-direction:column;}
