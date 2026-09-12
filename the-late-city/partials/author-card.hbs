@@ -1,0 +1,25 @@
+{{!-- An author, at the foot of a story. Called from inside
+      {{#foreach authors}}, so the context is the author.
+
+      With no profile image the box carries the author's initials.
+      The initial is cut from the name by CSS rather than by a helper,
+      so there is never a broken image and never an empty square.
+
+      CSS and not the split helper, on purpose. split does not exist in
+      Ghost 5, and a missing helper there is not a blank space: it is a
+      hard 400 on every story and every author page. --}}
+
+<div class="lc-authorcard">
+    <span class="lc-avatar" aria-hidden="true">
+        {{#if profile_image}}
+            <img src="{{img_url profile_image size="xs"}}" alt="" loading="lazy" decoding="async">
+        {{else}}
+            <i>{{name}}</i>
+        {{/if}}
+    </span>
+    <div>
+        <div class="lc-nm">{{name}}</div>
+        {{#if bio}}<p class="lc-bio">{{bio}}</p>{{/if}}
+        <a class="lc-arch" href="{{url}}">All stories by {{name}}</a>
+    </div>
+</div>

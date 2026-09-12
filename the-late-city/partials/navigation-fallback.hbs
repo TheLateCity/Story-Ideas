@@ -1,0 +1,20 @@
+{{!-- Used only when no primary navigation has been set in Ghost
+      Admin, so the menu is never an empty panel. Every link is a
+      real URL looked up from the site, never a guess: a desk that
+      has not published yet simply does not appear. --}}
+
+<div class="lc-nav-links" id="lc-nav-links">
+    <a href="{{@site.url}}/"{{#is "home"}} aria-current="page"{{/is}}><span class="lc-nav-label">Front page</span></a>
+
+    {{#get "tags" filter="slug:technology" limit="1"}}
+        {{#foreach tags}}<a href="{{url}}" data-desk="technology"><span class="lc-nav-label">{{name}}</span></a>{{/foreach}}
+    {{/get}}
+
+    {{#get "tags" filter="slug:philosophy" limit="1"}}
+        {{#foreach tags}}<a href="{{url}}" data-desk="philosophy"><span class="lc-nav-label">{{name}}</span></a>{{/foreach}}
+    {{/get}}
+
+    {{#get "pages" filter="slug:about" limit="1"}}
+        {{#foreach pages}}<a href="{{url}}"><span class="lc-nav-label">{{title}}</span></a>{{/foreach}}
+    {{/get}}
+</div>

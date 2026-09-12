@@ -1,0 +1,25 @@
+{{!< default}}
+
+{{!-- Shown when the whole publication is password protected. Ghost
+      handles the form; the theme only sets it. --}}
+
+{{#contentFor "chrome"}}compact{{/contentFor}}
+{{#contentFor "where"}}Private{{/contentFor}}
+
+<section class="lc-error">
+    <div class="lc-wrap">
+        <div class="lc-error-in">
+            <span class="lc-label"><b>{{@site.title}}</b><span class="lc-div" aria-hidden="true">/</span>Private</span>
+            <h1>This publication is not open yet.</h1>
+            <p>Enter the password you were given and the archive will open.</p>
+
+            {{#if error}}<p class="lc-note-error">{{error}}</p>{{/if}}
+
+            <form class="lc-password-form" method="post" action="">
+                <label class="lc-vh" for="lc-password">Password</label>
+                <input id="lc-password" type="password" name="password" autocomplete="current-password" required>
+                <button type="submit">Read</button>
+            </form>
+        </div>
+    </div>
+</section>

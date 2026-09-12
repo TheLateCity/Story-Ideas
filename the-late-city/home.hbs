@@ -1,0 +1,144 @@
+{{!< default}}
+
+{{!-- THE FRONT PAGE
+
+     The plate carries the masthead and the lead. Everything below it
+     is on paper, and the move from one to the other is the page's
+     main gesture.
+
+       This week    curated, 1 + 2 + 3
+       The two desks the argument the publication is written in
+       Latest       chronological
+       The Late Letter
+
+     A module with nothing to show prints nothing at all. A front
+     page with no posts still has a masthead, a letter and a footer,
+     and says plainly that the first stories are coming. It never
+     invents one. --}}
+
+{{#contentFor "chrome"}}full{{/contentFor}}
+
+{{#contentFor "plate"}}
+<div class="lc-wrap lc-plate-body">
+    {{!-- The lead is the newest featured post. Without one it is the
+          newest story that is not already in This week, so the front
+          page never opens on the same story twice. Without any posts
+          at all it is an empty state, never a demonstration story.
+
+          Each step is {{#if posts}} and NOT the {{else}} of {{#get}}.
+          That else does not fire on an empty result set: it fires when
+          the query fails. Written the obvious way, every fallback here
+          was unreachable, and a publication with nothing featured
+          opened on an empty black plate. --}}
+    {{#get "posts" filter="featured:true" limit="1" include="authors,tags"}}
+        {{#if posts}}
+            {{#foreach posts}}{{> "lead"}}{{/foreach}}
+        {{else}}
+            {{#get "posts" filter="tag:-hash-this-week" limit="1" include="authors,tags"}}
+                {{#if posts}}
+                    {{#foreach posts}}{{> "lead"}}{{/foreach}}
+                {{else}}
+                    {{#get "posts" limit="1" include="authors,tags"}}
+                        {{#if posts}}
+                            {{#foreach posts}}{{> "lead"}}{{/foreach}}
+                        {{else}}
+                            {{!-- The lead carries the front page's only
+                                  first level heading, so a front page
+                                  with no stories yet had none at all.
+                                  The publication's own name is the right
+                                  one, and it is not printed twice: the
+                                  wordmark above is already saying it. --}}
+                            <h1 class="lc-vh">{{@site.title}}</h1>
+                            <p class="lc-empty lc-plate-empty">The first stories are being reported. The Late Letter will carry them when they are ready.</p>
+                        {{/if}}
+                    {{/get}}
+                {{/if}}
+            {{/get}}
+        {{/if}}
+    {{/get}}
+</div>
+{{/contentFor}}
+
+
+{{!-- THIS WEEK
+      Genuinely selected: the internal tag #this-week is the editor's
+      choice, and the label is only true because of it. Featured posts
+      are excluded so the lead is not printed twice. One feature, two
+      supporting stories, three briefs, and fewer than six simply
+      stops early rather than leaving holes. --}}
+{{#get "posts" filter="tag:hash-this-week+featured:false" limit="6" include="authors,tags"}}
+    {{#if posts}}
+    <section class="lc-band" aria-labelledby="lc-week">
+        <div class="lc-wrap">
+            <div class="lc-band-head">
+                <h2 id="lc-week">This week</h2>
+                <span class="lc-note">Selected by the editor</span>
+            </div>
+
+            <div class="lc-week">
+                {{#foreach posts limit="1"}}{{> "story" variant="feature"}}{{/foreach}}
+
+                {{#match posts.length ">" 1}}
+                <div class="lc-week-support">
+                    {{#foreach posts from="2" to="3"}}{{> "story" variant="standard"}}{{/foreach}}
+                </div>
+                {{/match}}
+
+                {{#match posts.length ">" 3}}
+                <div class="lc-week-briefs">
+                    {{#foreach posts from="4" to="6"}}{{> "story" variant="brief"}}{{/foreach}}
+                </div>
+                {{/match}}
+            </div>
+        </div>
+    </section>
+    {{/if}}
+{{/get}}
+
+
+{{!-- THE TWO DESKS
+      Two rooms of one publication. A desk with nothing published yet
+      is left out rather than shown empty, and the survivor widens to
+      fill the page. --}}
+<section class="lc-band" aria-labelledby="lc-rooms">
+    <div class="lc-wrap">
+        <div class="lc-band-head">
+            <h2 id="lc-rooms">The two desks</h2>
+        </div>
+
+        <p class="lc-rooms-intro"><b>Technology</b> reports on what is being built. <b>Philosophy</b> works out what it costs. The Late City is written in the argument between them.</p>
+
+        <div class="lc-rooms">
+            {{#get "tags" filter="slug:technology" limit="1" include="count.posts"}}
+                {{#foreach tags}}{{#match count.posts ">" 0}}{{> "room" deskSlug=slug deskName=name deskUrl=url}}{{/match}}{{/foreach}}
+            {{/get}}
+
+            {{#get "tags" filter="slug:philosophy" limit="1" include="count.posts"}}
+                {{#foreach tags}}{{#match count.posts ">" 0}}{{> "room" deskSlug=slug deskName=name deskUrl=url}}{{/match}}{{/foreach}}
+            {{/get}}
+        </div>
+    </div>
+</section>
+
+
+{{!-- LATEST
+      Explicitly chronological, so overlapping with the modules above
+      is correct rather than a fault. --}}
+{{#get "posts" limit="7" include="authors,tags"}}
+    {{#if posts}}
+    <section class="lc-band" aria-labelledby="lc-latest">
+        <div class="lc-wrap">
+            <div class="lc-band-head">
+                <h2 id="lc-latest">Latest</h2>
+                <span class="lc-note">Most recently published</span>
+            </div>
+            <div class="lc-latest">
+                {{#foreach posts}}{{> "story" variant="row"}}{{/foreach}}
+            </div>
+        </div>
+    </section>
+    {{/if}}
+{{/get}}
+
+
+{{> "late-letter"}}

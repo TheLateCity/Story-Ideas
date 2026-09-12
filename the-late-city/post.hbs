@@ -1,0 +1,91 @@
+{{!< default}}
+
+{{!-- A STORY
+
+     The most important surface in the publication. It has to hold at
+     five hundred words and at ten thousand, so the measure is fixed
+     at about 41rem and only the editor's wide and full width cards
+     are allowed out of it.
+
+     The body is {{content}}, exactly as Ghost renders it. Nothing
+     here parses, rewrites or post processes what the editor wrote.
+     Reporting notes, corrections and disclosures are written in the
+     editor as documented HTML cards, so the theme never invents one
+     and never claims one exists. --}}
+
+{{#post}}
+
+{{#contentFor "chrome"}}compact{{/contentFor}}
+{{#contentFor "desk"}}{{primary_tag.slug}}{{/contentFor}}
+{{#contentFor "where"}}{{primary_tag.name}}{{/contentFor}}
+{{#contentFor "progress"}}<div class="lc-progress" data-lc-progress aria-hidden="true"><i></i></div>{{/contentFor}}
+
+<article class="lc-article {{post_class}}"{{#if primary_tag}} data-desk="{{primary_tag.slug}}"{{/if}} data-lc-reading-region>
+    <div class="lc-wrap">
+
+        <header class="lc-art-head">
+            {{> "story-label"}}
+            <h1>{{title}}</h1>
+
+            {{!-- Only a custom excerpt is a deck. An automatic one
+                  repeats the opening line immediately above itself. --}}
+            {{#if custom_excerpt}}<p class="lc-deck">{{custom_excerpt}}</p>{{/if}}
+
+            <div class="lc-art-meta">
+                <span class="lc-by">By {{authors autolink="true" separator=", "}}</span>
+                <time datetime="{{date format="YYYY-MM-DD"}}">{{date format="D MMMM YYYY"}}</time>
+                {{#match (date published_at format="YYYY-MM-DD") "!=" (date updated_at format="YYYY-MM-DD")}}
+                    <span class="lc-upd">Updated {{date updated_at format="D MMMM YYYY"}}</span>
+                {{/match}}
+                {{#if @custom.show_reading_time}}<span class="lc-dur">{{reading_time}}</span>{{/if}}
+            </div>
+        </header>
+
+        {{!-- A missing feature image is a valid editorial decision and
+              a story may open straight onto prose. Nothing generated
+              is ever put here: an illustration in the position of a
+              photograph would be a claim about the world. --}}
+        {{#if feature_image}}
+        <figure class="lc-art-media lc-media">
+            <span class="lc-frame">{{> "responsive-image" src=feature_image alt=feature_image_alt sizes="(max-width: 760px) 92vw, 656px" eager=true}}</span>
+            {{#if feature_image_caption}}<figcaption class="lc-mediacap">{{{feature_image_caption}}}</figcaption>{{/if}}
+        </figure>
+        {{/if}}
+
+        <div class="lc-prose" data-lc-prose>
+            {{content}}
+        </div>
+
+        <div class="lc-art-end">
+
+            {{#foreach authors}}{{> "author-card"}}{{/foreach}}
+
+            {{!-- Filed under. The label is printed inside the loop, so
+                  a story with only a desk tag prints no empty row, and
+                  internal tags can never appear: foreach hides them. --}}
+            {{#foreach tags from="2"}}
+                {{#if @first}}<div class="lc-topics"><span class="lc-lbl">Filed under</span>{{/if}}
+                <a href="{{url}}">{{name}}</a>
+                {{#if @last}}</div>{{/if}}
+            {{/foreach}}
+
+            {{#if @custom.show_related_reading}}
+                {{#if primary_tag}}
+                    {{#get "posts" filter="tag:{{primary_tag.slug}}+id:-{{id}}" limit="3" include="authors,tags"}}
+                        {{#if posts}}
+                        <section class="lc-related" aria-labelledby="lc-related">
+                            <h2 id="lc-related">Related reading</h2>
+                            {{#foreach posts}}{{> "story" variant="standard"}}{{/foreach}}
+                        </section>
+                        {{/if}}
+                    {{/get}}
+                {{/if}}
+            {{/if}}
+
+        </div>
+    </div>
+</article>
+
+{{/post}}
+
+{{> "late-letter"}}

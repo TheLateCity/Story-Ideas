@@ -1,0 +1,24 @@
+{{!-- One responsive image.
+
+     Call it with the image, its alt text, a sizes attribute that
+     matches where it is actually placed, and eager="true" for
+     anything above the fold.
+
+       {{> "responsive-image" src=feature_image alt=feature_image_alt
+           sizes="(max-width: 760px) 90vw, 600px"}}
+
+     Ghost only resizes images it stores itself; an external URL is
+     passed through untouched, which is why src is also the fallback
+     for src=. --}}
+
+<img src="{{img_url src size="l"}}"
+     srcset="{{img_url src size="xs"}} 160w,
+             {{img_url src size="s"}} 320w,
+             {{img_url src size="m"}} 600w,
+             {{img_url src size="l"}} 960w,
+             {{img_url src size="xl"}} 1200w,
+             {{img_url src size="xxl"}} 2000w"
+     sizes="{{#if sizes}}{{sizes}}{{else}}(max-width: 760px) 92vw, 600px{{/if}}"
+     alt="{{alt}}"
+     {{#if eager}}loading="eager" fetchpriority="high"{{else}}loading="lazy"{{/if}}
+     decoding="async">

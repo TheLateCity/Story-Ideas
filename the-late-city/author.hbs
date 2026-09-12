@@ -1,0 +1,63 @@
+{{!< default}}
+
+{{!-- AN AUTHOR
+
+     {{#author}} wraps the header and nothing else.
+
+     Wrapping the whole page in it makes the author object the
+     context, and then {{pagination}} is not reachable: Ghost answers
+     every author page with a hard 400, and {{#foreach posts}} in the
+     same block iterates a property the author does not have, so the
+     list renders empty and silently. The list and the pager below
+     sit outside it deliberately. --}}
+
+{{#contentFor "chrome"}}compact{{/contentFor}}
+
+{{#author}}
+    {{#contentFor "where"}}{{name}}{{/contentFor}}
+{{/author}}
+
+<section class="lc-band">
+    <div class="lc-wrap">
+
+        {{#author}}
+        <div class="lc-doc-title">
+            <header class="lc-authorhead">
+                <span class="lc-avatar" aria-hidden="true">
+                    {{#if profile_image}}
+                        <img src="{{img_url profile_image size="s"}}" alt="" loading="eager" decoding="async">
+                    {{else}}
+                        <i>{{name}}</i>
+                    {{/if}}
+                </span>
+                <div>
+                    <h1>{{name}}</h1>
+                    {{#if bio}}<p class="lc-bio">{{bio}}</p>{{/if}}
+
+                    {{#if website}}
+                        <p class="lc-links"><a href="{{website}}" rel="me noopener">{{website}}</a></p>
+                    {{/if}}
+                    {{#if location}}
+                        <p class="lc-links"><span>{{location}}</span></p>
+                    {{/if}}
+                </div>
+            </header>
+        </div>
+        {{/author}}
+
+        <div class="lc-band-head lc-band-head--spaced">
+            <h2>Stories</h2>
+            <span class="lc-note">{{plural pagination.total empty="Nothing published yet" singular="% published" plural="% published"}}</span>
+        </div>
+
+        {{#if posts}}
+            <div class="lc-latest">
+                {{#foreach posts}}{{> "story" variant="row"}}{{/foreach}}
+            </div>
+        {{else}}
+            <p class="lc-empty">This writer has nothing published under this name yet.</p>
+        {{/if}}
+
+        {{pagination}}
+    </div>
+</section>

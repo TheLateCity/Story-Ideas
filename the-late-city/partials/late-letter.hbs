@@ -1,0 +1,71 @@
+{{!-- The Late Letter.
+
+     Correspondence from the editor, not a conversion card. The mast
+     is set exactly like the publication's own, at a smaller scale,
+     and closes on the same red full stop.
+
+     The form is Ghost Members. Ghost puts .loading, .success and
+     .error on the form element itself, so every state is styled from
+     there: nothing here simulates a result. A reader who already
+     takes the letter is not asked to sign up for it again. --}}
+
+<section class="lc-band" id="lc-late-letter" aria-labelledby="lc-letter-mast">
+    <div class="lc-wrap">
+        <div class="lc-letter">
+            <div>
+                <p class="lc-letter-mast" id="lc-letter-mast">
+                    <svg class="lc-letter-mark" width="15" height="15" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+                        <circle cx="20" cy="20" r="8.5" fill="none" stroke="currentColor" stroke-width="1"></circle>
+                        <circle cx="20" cy="20" r="2.4" fill="currentColor"></circle>
+                        <path d="M20 0v10.5M20 29.5V40M0 20h10.5M29.5 20H40" stroke="currentColor" stroke-width="1" fill="none"></path>
+                    </svg>the late letter<i>.</i>
+                </p>
+
+                {{#if @custom.late_letter_heading}}<h2>{{@custom.late_letter_heading}}</h2>{{/if}}
+                {{#if @custom.late_letter_body}}<p>{{@custom.late_letter_body}}</p>{{/if}}
+
+                {{#if @custom.late_letter_signature}}
+                    <p class="lc-sign">
+                        <em>{{@custom.late_letter_signature}}</em>
+                        {{#if @custom.late_letter_role}}<span>{{@custom.late_letter_role}}</span>{{/if}}
+                    </p>
+                {{/if}}
+            </div>
+
+            <div class="lc-letter-form">
+                {{#if @member}}
+                    <p class="lc-letter-member">
+                        You are signed in as {{@member.email}}.
+                        <a href="#/portal/account">Manage what you receive</a>.
+                    </p>
+                {{else}}
+                    <p class="lc-ask">If you would like it, leave an address.</p>
+
+                    <form data-members-form="subscribe">
+                        <label class="lc-vh" for="lc-letter-email">Email address</label>
+                        <input id="lc-letter-email"
+                               type="email"
+                               name="email"
+                               data-members-email
+                               required
+                               autocomplete="email"
+                               placeholder="you@example.com">
+                        <button type="submit">Subscribe</button>
+                    </form>
+
+                    {{!-- Ghost fills the first of these when it has
+                          something to say, and leaves it empty when it
+                          does not. The second covers that case, and
+                          stands down as soon as Ghost writes a real
+                          message, so the reader is never left with a red
+                          line and no explanation. --}}
+                    <p class="lc-error-msg" data-members-error></p>
+                    <p class="lc-error-fallback">That did not go through. Check the address and try again.</p>
+                    <p class="lc-done">Thank you. There is a confirmation link in your inbox.</p>
+
+                    {{#if @custom.late_letter_fine}}<p class="lc-fine">{{@custom.late_letter_fine}}</p>{{/if}}
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</section>

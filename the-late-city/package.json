@@ -1,0 +1,103 @@
+{
+    "name": "the-late-city",
+    "description": "An editorial theme for a two desk publication: Technology reports on what is being built, Philosophy works out what it costs.",
+    "version": "1.0.9",
+    "engines": {
+        "ghost": ">=5.0.0"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "The Late City",
+        "email": "heysagar4@gmail.com"
+    },
+    "keywords": [
+        "ghost",
+        "theme",
+        "ghost-theme",
+        "editorial",
+        "publication",
+        "magazine"
+    ],
+    "config": {
+        "posts_per_page": 12,
+        "card_assets": true,
+        "image_sizes": {
+            "xs": {
+                "width": 160
+            },
+            "s": {
+                "width": 320
+            },
+            "m": {
+                "width": 600
+            },
+            "l": {
+                "width": 960
+            },
+            "xl": {
+                "width": 1200
+            },
+            "xxl": {
+                "width": 2000
+            }
+        },
+        "custom": {
+            "masthead_note": {
+                "type": "text",
+                "group": "homepage",
+                "description": "The line under the wordmark on the front page.",
+                "default": "We arrive late on purpose. Reporting on what is being built, and arguments about what it is doing to the rest of us."
+            },
+            "late_letter_heading": {
+                "type": "text",
+                "group": "homepage",
+                "description": "The headline of the newsletter section.",
+                "default": "The week does not end when the news does."
+            },
+            "late_letter_body": {
+                "type": "text",
+                "group": "homepage",
+                "description": "The editor's note in the newsletter section.",
+                "default": "Every Sunday evening we send one letter: the story we could not stop thinking about, the argument it provoked, and a short note on anything we got wrong. It arrives after the week has finished making noise, which is generally the only time any of it is legible."
+            },
+            "late_letter_signature": {
+                "type": "text",
+                "group": "homepage",
+                "description": "Who signs the letter. Leave empty to omit the signature.",
+                "default": "Sagar Sharma"
+            },
+            "late_letter_role": {
+                "type": "text",
+                "group": "homepage",
+                "description": "The line under the signature.",
+                "default": "Editor, The Late City"
+            },
+            "late_letter_fine": {
+                "type": "text",
+                "group": "homepage",
+                "description": "The small print under the form. Keep it accurate.",
+                "default": "One letter a week. You can unsubscribe from any issue."
+            },
+            "contact_email": {
+                "type": "text",
+                "description": "Editorial address for the footer. Leave empty to omit the link."
+            },
+            "corrections_email": {
+                "type": "text",
+                "description": "Corrections address. Leave empty to link the standards page instead."
+            },
+            "show_reading_time": {
+                "type": "boolean",
+                "group": "post",
+                "description": "Show the estimated reading time on stories.",
+                "default": true
+            },
+            "show_related_reading": {
+                "type": "boolean",
+                "group": "post",
+                "description": "Show Related reading at the foot of a story.",
+                "default": true
+            }
+        }
+    }
+}

@@ -1,0 +1,16 @@
+{{!-- Ghost renders this in place of {{navigation}}.
+
+     A desk link carries its own colour. The match is on the end of
+     the URL rather than the label, so renaming "Technology" to
+     "The technology desk" in Ghost Admin keeps the blue, and a
+     custom /technology/ route works as well as /tag/technology/.
+
+     The label sits in its own element so the current page marker can
+     be the width of the word. The anchor stays the full width of the
+     row, because that is the thing a thumb has to hit. --}}
+
+<div class="lc-nav-links" id="lc-nav-links">
+    {{#foreach navigation}}
+        <a href="{{url absolute="true"}}"{{#match url "~$" "/technology/"}} data-desk="technology"{{/match}}{{#match url "~$" "/philosophy/"}} data-desk="philosophy"{{/match}}{{#if current}} aria-current="page"{{/if}}><span class="lc-nav-label">{{label}}</span></a>
+    {{/foreach}}
+</div>

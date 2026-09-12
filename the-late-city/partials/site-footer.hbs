@@ -1,0 +1,103 @@
+{{!-- The footer is institutional, not commercial: what the
+      publication is, where its documents are, and who set it.
+
+      Every link is a real URL read from the site, and every column
+      prints only if it has something in it. A page that has not been
+      written yet does not appear, and neither does the heading that
+      would have stood over it: one query for the whole footer left
+      Publication and Legal as headings above an empty list, which is
+      the state every publication starts in. --}}
+
+<footer class="lc-foot">
+    <div class="lc-wrap">
+        <div class="lc-foot-grid">
+
+            <div class="lc-foot-brand">
+                <div class="lc-foot-mark">{{@site.title}}<i>.</i></div>
+                <p>{{#if @site.description}}{{@site.description}}{{else}}Two desks and one argument. Technology reports on what is being built; Philosophy works out what it costs.{{/if}}</p>
+            </div>
+
+            {{#get "tags" filter="slug:[technology,philosophy]" limit="2"}}
+                {{#if tags}}
+                <nav class="lc-foot-col" aria-labelledby="lc-f-sections">
+                    <h2 id="lc-f-sections">Sections</h2>
+                    <ul>
+                        {{#foreach tags}}{{#match slug "technology"}}<li><a href="{{url}}">{{name}}</a></li>{{/match}}{{/foreach}}
+                        {{#foreach tags}}{{#match slug "philosophy"}}<li><a href="{{url}}">{{name}}</a></li>{{/match}}{{/foreach}}
+                    </ul>
+                </nav>
+                {{/if}}
+            {{/get}}
+
+            {{#get "pages" filter="slug:[about,editorial-standards,contact]" limit="3"}}
+                {{#if pages}}
+                <nav class="lc-foot-col" aria-labelledby="lc-f-pub">
+                    <h2 id="lc-f-pub">Publication</h2>
+                    <ul>
+                        {{#foreach pages}}{{#match slug "about"}}<li><a href="{{url}}">{{title}}</a></li>{{/match}}{{/foreach}}
+                        {{#foreach pages}}{{#match slug "editorial-standards"}}<li><a href="{{url}}">{{title}}</a></li>{{/match}}{{/foreach}}
+                        {{#if @custom.corrections_email}}
+                            <li><a href="mailto:{{@custom.corrections_email}}">Corrections</a></li>
+                        {{else}}
+                            {{#foreach pages}}{{#match slug "editorial-standards"}}<li><a href="{{url}}#corrections">Corrections</a></li>{{/match}}{{/foreach}}
+                        {{/if}}
+                        {{#if @custom.contact_email}}
+                            <li><a href="mailto:{{@custom.contact_email}}">Contact</a></li>
+                        {{else}}
+                            {{#foreach pages}}{{#match slug "contact"}}<li><a href="{{url}}">{{title}}</a></li>{{/match}}{{/foreach}}
+                        {{/if}}
+                    </ul>
+                </nav>
+                {{else}}
+                    {{!-- No documents written yet. If the editor has given
+                          an address, the column is the address. If not,
+                          there is no column at all. --}}
+                    {{#if @custom.contact_email}}
+                    <nav class="lc-foot-col" aria-labelledby="lc-f-pub">
+                        <h2 id="lc-f-pub">Publication</h2>
+                        <ul>
+                            {{#if @custom.corrections_email}}<li><a href="mailto:{{@custom.corrections_email}}">Corrections</a></li>{{/if}}
+                            <li><a href="mailto:{{@custom.contact_email}}">Contact</a></li>
+                        </ul>
+                    </nav>
+                    {{else}}
+                        {{#if @custom.corrections_email}}
+                        <nav class="lc-foot-col" aria-labelledby="lc-f-pub">
+                            <h2 id="lc-f-pub">Publication</h2>
+                            <ul><li><a href="mailto:{{@custom.corrections_email}}">Corrections</a></li></ul>
+                        </nav>
+                        {{/if}}
+                    {{/if}}
+                {{/if}}
+            {{/get}}
+
+            {{!-- The reader column always has something in it: the letter
+                  belongs to the theme and the account belongs to Ghost. --}}
+            <nav class="lc-foot-col" aria-labelledby="lc-f-reader">
+                <h2 id="lc-f-reader">Reader</h2>
+                <ul>
+                    <li><a href="{{@site.url}}/#lc-late-letter">The Late Letter</a></li>
+                    {{#if @member}}
+                        <li><a href="#/portal/account">Your account</a></li>
+                    {{else}}
+                        <li><a href="#/portal/signin">Sign in</a></li>
+                    {{/if}}
+                </ul>
+            </nav>
+
+            {{#get "pages" filter="slug:[privacy,terms]" limit="2"}}
+                {{#if pages}}
+                <nav class="lc-foot-col" aria-labelledby="lc-f-legal">
+                    <h2 id="lc-f-legal">Legal</h2>
+                    <ul>
+                        {{#foreach pages}}{{#match slug "privacy"}}<li><a href="{{url}}">{{title}}</a></li>{{/match}}{{/foreach}}
+                        {{#foreach pages}}{{#match slug "terms"}}<li><a href="{{url}}">{{title}}</a></li>{{/match}}{{/foreach}}
+                    </ul>
+                </nav>
+                {{/if}}
+            {{/get}}
+        </div>
+
+        <div class="lc-colophon">&copy; {{date format="YYYY"}} {{@site.title}}</div>
+    </div>
+</footer>

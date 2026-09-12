@@ -1,0 +1,22 @@
+{{!-- SECTION / TYPE. The section half carries the desk colour.
+
+     The type is the first public tag after the desk that is not itself
+     a desk. A story tagged Technology and then Philosophy is not an
+     essay of type "Philosophy": it is a Technology story that also
+     touches the other desk, and reading the second desk as a type
+     printed TECHNOLOGY / PHILOSOPHY, which claims something the editor
+     never said. Both desks are skipped when looking for the type.
+
+     foreach cannot stop at the first match, so every candidate is
+     printed and CSS shows the first. The separator lives on the part
+     rather than beside it, so it cannot exist without the word after
+     it: a lone slash above a headline is structurally impossible here.
+
+     No tag is ever linked. The whole card is already a link, and an
+     anchor inside an anchor makes the browser close the outer one
+     early, which silently drops the headline out of the link.
+
+     foreach excludes internal tags by default, so #this-week and its
+     kind can never surface. --}}
+
+{{#if primary_tag}}<span class="lc-label"><b>{{primary_tag.name}}</b>{{#foreach tags from="2"}}{{#match slug "!=" "technology"}}{{#match slug "!=" "philosophy"}}<span class="lc-label-part">{{name}}</span>{{/match}}{{/match}}{{/foreach}}</span>{{/if}}

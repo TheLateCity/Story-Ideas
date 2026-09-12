@@ -1,0 +1,27 @@
+{{!< default}}
+
+{{!-- The general archive. Ghost uses this for page two of the front
+      page and for any listing without a template of its own. It is
+      an index in a publication rather than a grid of cards. --}}
+
+{{#contentFor "chrome"}}compact{{/contentFor}}
+{{#contentFor "where"}}Archive{{/contentFor}}
+
+<section class="lc-band">
+    <div class="lc-wrap">
+        <div class="lc-band-head">
+            <h1>All stories</h1>
+            <span class="lc-note">Most recently published first</span>
+        </div>
+
+        {{#if posts}}
+            <div class="lc-index" data-lc-folios data-page="{{pagination.page}}" data-limit="{{pagination.limit}}">
+                {{#foreach posts}}{{> "story" variant="index" heading="2"}}{{/foreach}}
+            </div>
+        {{else}}
+            <p class="lc-empty">Nothing has been published yet.</p>
+        {{/if}}
+
+        {{pagination}}
+    </div>
+</section>

@@ -1,0 +1,21 @@
+{{!-- The picture box for a story.
+
+     One aspect ratio everywhere, 3:2, and the space is always
+     reserved, so nothing moves on the page when real photography
+     arrives later.
+
+     A story without a feature image gets a halftone screened at 45
+     degrees, the angle used for the black plate in offset printing.
+     It is seeded from the post id, so it is the same picture every
+     time a reader sees that story, and it is decoration: it carries
+     aria-hidden, no alt text and no caption, and it is never
+     presented as a photograph of anything. The headline is the
+     meaning; this is the rhythm. --}}
+
+<span class="lc-frame">
+    {{#if feature_image}}
+        {{> "responsive-image" src=feature_image alt=feature_image_alt sizes=sizes eager=eager}}
+    {{else}}
+        <canvas data-lc-halftone="{{id}}" data-ratio="3/2" aria-hidden="true"></canvas>
+    {{/if}}
+</span>

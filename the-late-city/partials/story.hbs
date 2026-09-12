@@ -1,0 +1,98 @@
+{{!-- A story, at one of six densities.
+
+       feature    headline, deck, byline, large picture
+       standard   headline, deck, reading time, medium thumbnail
+       compact    headline, small thumbnail
+       brief      headline, reading time, small thumbnail
+       row        date, headline, desk and reading time, thumbnail
+       index      folio, type and topic, headline, deck, date
+
+     The differing densities are the editorial judgment. Six equal
+     cards would throw it away.
+
+     Call it as {{> "story" variant="standard"}} from inside a
+     {{#foreach posts}}. Add label="desk" inside a desk, where
+     repeating the section on every card tells the reader nothing, and
+     heading="2" where the card sits directly under the page's h1.
+
+     Nothing inside the card is a link: the card itself is the link,
+     and an anchor inside an anchor makes the browser close the outer
+     one early, which drops the headline and the picture out of it.
+
+     The wrappers that hold a headline or a paragraph are divs, not
+     spans. A span takes phrasing content only, and an h3 inside one is
+     invalid however it renders. The anchor may hold them because an
+     anchor is transparent: it takes whatever its own parent takes. --}}
+
+<article class="lc-item">
+    <a class="lc-story lc-story--{{variant}}"{{#if primary_tag}} data-desk="{{primary_tag.slug}}"{{/if}} href="{{url}}">
+
+    {{#match variant "row"}}
+
+        <div class="lc-row-in">
+            <span class="lc-when lc-dur"><time datetime="{{date format="YYYY-MM-DD"}}">{{date format="D MMM"}}</time></span>
+            <h3><span>{{title}}</span></h3>
+            <span class="lc-rmeta lc-dur">{{#if primary_tag}}<b>{{primary_tag.name}}</b>{{/if}}{{#if @custom.show_reading_time}} &nbsp;{{reading_time}}{{/if}}</span>
+        </div>
+        <span class="lc-thumb">{{> "story-image" sizes="(max-width: 760px) 76px, 80px"}}</span>
+
+    {{else match variant "index"}}
+
+        <div class="lc-irow">
+            <span class="lc-folio" aria-hidden="true"></span>
+            <div class="lc-story-text">
+                {{> "story-label-desk"}}
+                {{!-- The level is the caller's, because it depends on
+                      what the card is under. On a desk the archive is
+                      already an h2, so a headline is an h3. On a topic
+                      or the general archive the page title is the h1
+                      and there is nothing between, so a headline that
+                      stayed an h3 skipped a level. --}}
+                {{#match heading "2"}}<h2><span>{{title}}</span></h2>{{else}}<h3><span>{{title}}</span></h3>{{/match}}
+                {{#if excerpt}}<p class="lc-deck">{{excerpt words="26"}}</p>{{/if}}
+            </div>
+            <span class="lc-rmeta lc-dur"><time datetime="{{date format="YYYY-MM-DD"}}">{{date format="D MMM"}}</time>{{#if @custom.show_reading_time}} &nbsp;{{reading_time}}{{/if}}</span>
+        </div>
+        <span class="lc-thumb">{{> "story-image" sizes="(max-width: 760px) 96px, 152px"}}</span>
+
+    {{else match variant "feature"}}
+
+        <div class="lc-story-text">
+            {{#match label "desk"}}{{> "story-label-desk"}}{{else}}{{> "story-label"}}{{/match}}
+            <h3><span>{{title}}</span></h3>
+            {{#if excerpt}}<p class="lc-deck">{{excerpt words="34"}}</p>{{/if}}
+            <span class="lc-story-meta">{{authors autolink="false"}}{{#if @custom.show_reading_time}}, {{reading_time}}{{/if}}</span>
+        </div>
+        <figure class="lc-media">{{> "story-image" sizes="(max-width: 900px) 92vw, 420px"}}</figure>
+
+    {{else match variant "compact"}}
+
+        <div class="lc-story-text">
+            {{#match label "desk"}}{{> "story-label-desk"}}{{else}}{{> "story-label"}}{{/match}}
+            <h3><span>{{title}}</span></h3>
+        </div>
+        <span class="lc-thumb">{{> "story-image" sizes="(max-width: 760px) 76px, 88px"}}</span>
+
+    {{else match variant "brief"}}
+
+        <div class="lc-story-text">
+            {{#match label "desk"}}{{> "story-label-desk"}}{{else}}{{> "story-label"}}{{/match}}
+            <h3><span>{{title}}</span></h3>
+            {{#if @custom.show_reading_time}}<span class="lc-story-meta">{{reading_time}}</span>{{/if}}
+        </div>
+        <span class="lc-thumb">{{> "story-image" sizes="(max-width: 760px) 76px, 88px"}}</span>
+
+    {{else}}
+
+        <div class="lc-story-text">
+            {{#match label "desk"}}{{> "story-label-desk"}}{{else}}{{> "story-label"}}{{/match}}
+            <h3><span>{{title}}</span></h3>
+            {{#if excerpt}}<p class="lc-deck">{{excerpt words="26"}}</p>{{/if}}
+            {{#if @custom.show_reading_time}}<span class="lc-story-meta">{{reading_time}}</span>{{/if}}
+        </div>
+        <span class="lc-thumb">{{> "story-image" sizes="(max-width: 760px) 96px, 144px"}}</span>
+
+    {{/match}}
+
+    </a>
+</article>

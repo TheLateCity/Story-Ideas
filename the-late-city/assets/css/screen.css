@@ -1,0 +1,1646 @@
+/* ============================================================
+   THE LATE CITY
+   ------------------------------------------------------------
+   Typography is assigned by editorial function, never by size.
+
+     Newsreader       the journalism: wordmark, headlines, decks,
+                      body, pull quotes, subheads, document headings
+     Instrument Sans  everything that is not the journalism:
+                      navigation, metadata, captions, forms, footer
+     IBM Plex Mono    one job only: the SECTION / TYPE label
+
+   Every text style takes a step from the scale in :root.
+   Nothing declares a bespoke size.
+
+   Contents
+     1  tokens                 12 desk archives
+     2  reset and base         13 articles
+     3  accessibility          14 editor content and Koenig cards
+     4  the three voices       15 trust blocks
+     5  publication shell      16 document pages
+     6  navigation             17 authors
+     7  sticky dock            18 the Late Letter
+     8  media                  19 pagination
+     9  story components       20 footer
+    10  homepage               21 errors and empty states
+    11  desk plate             22 responsive
+                               23 print
+   ============================================================ */
+
+/* ============================================================
+   1. TOKENS
+   ============================================================ */
+:root{
+  --plate:#0E0E11;
+  --plate-ink:#EDEDE7;
+  --plate-dim:#93938C;
+  --plate-rule:#2C2C33;
+  --plate-hair:#1D1D23;
+
+  --paper:#E9E8E3;
+  --ink:#131318;
+  --body:#33333A;
+  --dim:#5F5F67;
+
+  /* THE THREE RULES, AND WHAT EACH ONE MEANS
+
+     Whitespace separates. Typography organises. A rule is drawn only
+     where neither of those is enough, and every rule in the theme is
+     one of these three. Before adding one, answer what it says that
+     the space and the heading above it have not already said.
+
+     --rule-strong   publication architecture. The head of a section,
+                     the title block of a document, the moment the
+                     journalism ends, the footer, a table's header row.
+                     Seven places in the whole theme. It should stay
+                     that rare.
+     --rule          a real but secondary transition: into Related
+                     reading, under a pager, the module boundary the
+                     Late Letter owns, a thematic break the author
+                     wrote.
+     --hair          an index. Rows a reader scans down: the archive,
+                     Latest, the stories in a desk room, the tiers of
+                     This week, a table's body.
+
+     A fourth level exists and is the default: no rule at all. Ordinary
+     prose, editorial lists, definitions, the sections of a standing
+     document and the cards in Related reading are all separated by
+     space and set apart by type.
+
+     The desk colours are not on this scale. A 2px --tech or --phil
+     rule says which desk this is, which is information no amount of
+     whitespace can carry. */
+  --rule-strong:#131318;
+  --rule:#C7C7C0;
+  --hair:#D7D7D1;
+
+  --tech:#0A5F8C;
+  --phil:#A81430;
+  --accent:var(--phil);
+
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+
+  /* the scale: nine steps, each with one job */
+  --t-wordmark:clamp(2.5rem,7.4vw,5.4rem);
+  --t-h1:clamp(1.95rem,4.4vw,3.4rem);
+  --t-feature:clamp(1.5rem,2.7vw,2.05rem);
+  --t-headline:1.375rem;
+  --t-compact:1.0625rem;
+  --t-deck:1.0625rem;
+  --t-body:1.1875rem;
+  --t-meta:.8125rem;
+  --t-label:.75rem;
+
+  --maxw:1240px;
+  --gutter:clamp(1.15rem,4vw,2.75rem);
+  /* The reading measure, counted in characters rather than pixels.
+     Newsreader at 19px runs about 8.2px to the character, so 41rem
+     was setting a line of eighty and the eye lost its place on the
+     return sweep. 36rem is a line of seventy, which is the top of
+     the range the newspapers set to and the width the story column
+     is centred at. */
+  --measure:36rem;
+  /* What a wide card breaks out to. It used to be the whole
+     publication wrap, which was a card twice the width of the column
+     it interrupts: at that ratio a photograph stops being an
+     illustration in a story and becomes the page. Half as wide again
+     as the measure is a clear step out of the column and still
+     obviously part of the same piece. Full width is untouched and is
+     still the way to run something to the gutters. */
+  --breakout:min(var(--lc-wrap-w),54rem);
+  /* A standing document is not a story. It reads beside a contents
+     column rather than down the middle of the page, and it sets a
+     little wider because it is consulted as much as it is read. */
+  --doc-measure:44rem;
+
+  /* The publication wrap, and how far it sits from the viewport edge.
+     Editor cards that break out of the reading column measure from
+     these rather than from the column they are sitting in.
+
+     The edge is the gutter plus whatever the device keeps for itself.
+     With viewport-fit=cover a notched phone in landscape hands back a
+     real inset, and taking the larger of the two keeps the page
+     centred instead of sliding it off the notch. Everywhere else the
+     insets are zero and this is exactly the gutter. */
+  --lc-safe-l:env(safe-area-inset-left,0px);
+  --lc-safe-r:env(safe-area-inset-right,0px);
+  --lc-edge:calc(var(--gutter) + max(var(--lc-safe-l),var(--lc-safe-r)));
+  --lc-wrap-w:min(calc(100vw - (var(--lc-edge) * 2)),var(--maxw));
+  --lc-wrap-x:calc((100vw - var(--lc-wrap-w)) / 2);
+
+  /* The dock's height, so an anchored heading can clear it. The bar
+     itself is 3.1rem and it holds the safe area above it, which on a
+     notched phone is another 47px: a heading reached from the contents
+     column landed underneath it. */
+  --lc-dock-h:calc(3.1rem + env(safe-area-inset-top,0px));
+
+  color-scheme:light;
+}
+
+/* the desk colour travels on the element, so a card, a rule and a
+   hover underline all read the same accent without a second class */
+[data-desk="technology"]{--desk:var(--tech);}
+[data-desk="philosophy"]{--desk:var(--phil);}
+
+/* The plate is near black in BOTH themes, and the desk colours are cut
+   for paper. Technology blue on the plate measured 2.77 to 1, which is
+   a desk's own question set in a colour a reader has to lean in to
+   read. Every other colour on the plate already has a plate variant
+   (--plate-ink, --plate-dim, --plate-rule); these are the two that did
+   not. They are the same lifted values dark mode uses, because the
+   plate is the same near black surface dark mode is made of.
+
+   Only --desk is lifted, not --tech and --phil themselves: the red full
+   stop in the wordmark is the publication's mark at one of its four
+   scales, and those four have to stay the same colour as each other. */
+.lc-plate [data-desk="technology"],.lc-plate[data-desk="technology"]{--desk:#74B6DE;}
+.lc-plate [data-desk="philosophy"],.lc-plate[data-desk="philosophy"]{--desk:#F0616F;}
+.lc-dock[data-desk="technology"]{--desk:#74B6DE;}
+.lc-dock[data-desk="philosophy"]{--desk:#F0616F;}
+:root[data-section="technology"]{--accent:var(--tech);}
+:root[data-section="philosophy"]{--accent:var(--phil);}
+
+/* Dark is a re-grading, not an inversion: the plate goes to true
+   black, paper becomes near black, and the desk colours are lifted
+   until they carry the same weight against a dark ground. */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --plate:#000000; --plate-ink:#EFEFE9; --plate-dim:#8B8B93;
+    --plate-rule:#26262D; --plate-hair:#17171C;
+    --paper:#16161B; --ink:#F1F1EB; --body:#BCBCB6; --dim:#8A8A92;
+    --rule-strong:#F1F1EB; --rule:#33333B; --hair:#26262E;
+    --tech:#74B6DE; --phil:#F0616F;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --plate:#000000; --plate-ink:#EFEFE9; --plate-dim:#8B8B93;
+  --plate-rule:#26262D; --plate-hair:#17171C;
+  --paper:#16161B; --ink:#F1F1EB; --body:#BCBCB6; --dim:#8A8A92;
+  --rule-strong:#F1F1EB; --rule:#33333B; --hair:#26262E;
+  --tech:#74B6DE; --phil:#F0616F;
+  color-scheme:dark;
+}
+
+/* ============================================================
+   2. RESET AND BASE
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;}
+/* overflow-wrap and not overflow-x:hidden.
+
+   A bare URL in body copy is one long word. Left alone it pushed the
+   reading column past the screen, and hiding the overflow on the body
+   only meant the reader could not scroll to the part that had been
+   pushed off: the text was still unreachable, and the initial
+   containing block still grew, which took the fixed dock and the
+   reading line out to the width of the overflow with it.
+
+   break-word breaks a word only when the word alone cannot fit, so
+   ordinary prose is unaffected. It is inherited, so one declaration
+   covers headlines, decks, lists, captions and links. Nothing here
+   clips the page: if something overflows now, it shows, which is the
+   only way it ever gets fixed. */
+body{
+  margin:0;background:var(--paper);color:var(--body);
+  font-family:var(--sans);font-size:1rem;line-height:1.6;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  overflow-wrap:break-word;
+}
+a{color:inherit;text-decoration:none;}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;}
+canvas,img,svg,video,iframe{display:block;max-width:100%;}
+img{height:auto;}
+h1,h2,h3,h4,h5,h6,p,ul,ol,dl,dd,figure,blockquote,table,pre{margin:0;}
+ul,ol{padding:0;list-style:none;}
+::selection{background:var(--ink);color:var(--paper);}
+
+/* The wrap measures its parent rather than the viewport. 100vw counts a
+   scrollbar the page does not have, and on a phone reporting a device
+   pixel ratio of 3 it rounds up: the document came out one pixel wider
+   than the screen and scrolled sideways by that pixel. The breakout
+   cards still need viewport units, and --lc-wrap-w keeps them. */
+.lc-wrap{width:min(100% - (var(--lc-edge) * 2),var(--maxw));margin-inline:auto;}
+
+/* ============================================================
+   3. ACCESSIBILITY
+   ============================================================ */
+.lc-vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+.lc-skip{
+  position:fixed;top:.5rem;left:.5rem;z-index:200;transform:translateY(-260%);
+  background:var(--plate);color:var(--plate-ink);padding:.7rem 1.1rem;
+  font-size:var(--t-meta);font-weight:600;letter-spacing:.06em;
+}
+.lc-skip:focus{transform:none;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+.lc-plate :focus-visible{outline-color:var(--plate-ink);}
+main:focus{outline:none;}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{transition-duration:.001ms!important;animation-duration:.001ms!important;}
+}
+
+/* ============================================================
+   4. THE THREE VOICES
+   ============================================================ */
+
+/* mono, and only here: the label that classifies a story */
+.lc-label{
+  display:block;
+  font-family:var(--mono);font-size:var(--t-label);font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--dim);
+}
+.lc-label b{color:var(--desk,var(--accent));font-weight:500;}
+/* lc-div is a static pair, such as the publication and an error code.
+   The separator between tags is not written in the markup at all: it
+   belongs to the part that follows it, so it cannot outlive the word
+   it introduces. A lone slash above a headline is unrepresentable. */
+.lc-label .lc-sl,.lc-label .lc-div{opacity:.4;padding:0 .3em;}
+.lc-label b + .lc-label-part::before,
+.lc-label .lc-label-part + .lc-label-part::before{content:"/";opacity:.4;padding:0 .3em;}
+/* foreach cannot stop at the first match, so every eligible tag is
+   printed and the label keeps what it needs: one type on a story,
+   type and topic inside a desk, only the type in a narrow room. */
+.lc-label .lc-label-part:nth-of-type(n+2){display:none;}
+
+/* Inside a desk each eligible tag prints its own label rather than
+   sharing a wrapper, because a wrapper would have to be written before
+   anything was known about its contents. The sibling combinator keeps
+   the first two and the separator belongs to the second, so it cannot
+   appear on its own. In the narrow column of a front page room only
+   the type survives. */
+.lc-label--desk{display:inline-block;}
+.lc-label--desk ~ .lc-label--desk::before{content:"/";opacity:.4;padding:0 .3em;}
+.lc-label--desk ~ .lc-label--desk{display:inline-block;}
+.lc-label--desk ~ .lc-label--desk ~ .lc-label--desk{display:none;}
+.lc-room .lc-label--desk ~ .lc-label--desk{display:none;}
+/* the classification is scarce horizontal space on a phone: it wraps
+   rather than pushing the card sideways, and never shrinks below
+   legibility */
+.lc-label{overflow-wrap:anywhere;}
+.lc-room-name{
+  font-family:var(--mono);font-size:var(--t-label);font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--desk);
+}
+
+/* sans: metadata, utility, anything that is not the journalism */
+.lc-util{
+  font-family:var(--sans);font-size:var(--t-label);font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;font-variant-numeric:tabular-nums;
+}
+.lc-dur{
+  font-family:var(--sans);font-size:var(--t-meta);color:var(--dim);
+  letter-spacing:0;text-transform:none;font-variant-numeric:tabular-nums;
+}
+
+/* serif: the journalism. every deck is serif. */
+.lc-deck{
+  font-family:var(--serif);font-variation-settings:"opsz" 18,"wght" 400;
+  font-size:var(--t-deck);line-height:1.5;color:var(--dim);text-wrap:pretty;
+}
+
+/* ============================================================
+   5. PUBLICATION SHELL
+   ============================================================ */
+.lc-plate{background:var(--plate);color:var(--plate-ink);border-bottom:1px solid var(--plate-rule);}
+.lc-plate a{color:inherit;}
+.lc-plate .lc-deck,.lc-plate .lc-meta,.lc-plate .lc-dur,.lc-plate .lc-label{color:var(--plate-dim);}
+.lc-plate .lc-label b{color:var(--plate-ink);}
+
+/* One item, so no space-between waiting for a second child to balance
+   against. It wraps rather than being clipped: a date is short, and a
+   long localised one should fold instead of losing its year. */
+.lc-slug{
+  padding:.8rem 0;color:var(--plate-dim);border-bottom:1px solid var(--plate-hair);
+  overflow-wrap:break-word;
+}
+
+.lc-mastrow{padding:clamp(1.5rem,3.6vw,2.4rem) 0 clamp(1.1rem,2.4vw,1.6rem);}
+/* The wordmark prints the site's own title, in the publication's
+   setting: lowercase, cut fine, tracked tight, closing on the red
+   full stop that recurs at four scales across the site. */
+.lc-wordmark{
+  display:inline-block;
+  font-family:var(--serif);font-variation-settings:"opsz" 72,"wght" 360;
+  font-size:var(--t-wordmark);line-height:.84;letter-spacing:-.032em;
+  text-transform:lowercase;
+  color:var(--plate-ink);margin-left:-.028em;
+}
+.lc-wordmark i{color:var(--phil);font-style:normal;letter-spacing:0;}
+.lc-mast-note{
+  margin-top:1rem;max-width:32rem;
+  font-family:var(--serif);font-variation-settings:"opsz" 18,"wght" 400;
+  font-size:var(--t-deck);line-height:1.5;color:var(--plate-dim);
+}
+
+/* Three densities. The closer the reader is to the journalism, the
+   quieter the interface gets. Set server side, from the template. */
+[data-chrome="medium"] .lc-mastrow{padding:clamp(1.1rem,2.4vw,1.5rem) 0 clamp(.8rem,1.8vw,1rem);}
+[data-chrome="medium"] .lc-wordmark{font-size:clamp(1.5rem,3vw,2rem);}
+[data-chrome="compact"] .lc-slug{display:none;}
+[data-chrome="compact"] .lc-mastrow{padding:clamp(.85rem,1.8vw,1.1rem) 0 clamp(.65rem,1.4vw,.85rem);}
+[data-chrome="compact"] .lc-wordmark{font-size:clamp(1.3rem,2.4vw,1.6rem);}
+
+/* ============================================================
+   6. NAVIGATION
+   ============================================================ */
+.lc-nav{display:flex;align-items:stretch;justify-content:space-between;gap:1rem;border-top:1px solid var(--plate-rule);}
+.lc-nav-links{display:flex;flex-wrap:wrap;}
+.lc-nav-links a{
+  padding:.95rem 1.3rem .9rem 0;margin-right:.3rem;
+  font-size:var(--t-meta);font-weight:500;color:var(--plate-dim);transition:color .18s ease;
+}
+/* The marker is the width of the word, because it marks the word. It
+   hangs off the label rather than the anchor: the anchor is a touch
+   target and runs the width of the row on a phone, and a rule drawn
+   across all of that reads as a section divider rather than as "you
+   are here". */
+.lc-nav-label{position:relative;display:inline-block;}
+.lc-nav-label::after{
+  content:"";position:absolute;left:0;right:0;bottom:-.28em;height:2px;
+  background:var(--nc,var(--plate-ink));transform:scaleX(0);transform-origin:left;
+  transition:transform .2s ease;
+}
+/* the marker is drawn on the plate, so it takes the plate's desk
+   colours rather than the paper's */
+.lc-nav-links a[data-desk="technology"]{--nc:#74B6DE;}
+.lc-nav-links a[data-desk="philosophy"]{--nc:#F0616F;}
+.lc-nav-links a[aria-current="page"] .lc-nav-label::after{transform:scaleX(1);}
+.lc-nav-links a[aria-current="page"]{color:var(--plate-ink);}
+.lc-nav-end{display:flex;align-items:center;gap:1.1rem;}
+.lc-nav-menu{display:none;font-family:var(--sans);font-size:var(--t-meta);}
+
+/* A control that cannot work is not offered: the toggle appears only
+   once the inline script in the head has marked scripting as live. */
+.lc-toggle{display:none;}
+:root[data-js="on"] .lc-toggle{
+  display:inline-flex;align-items:center;gap:.5rem;
+  min-height:2.2rem;padding:.35rem .65rem .35rem .5rem;
+  border:1px solid var(--plate-rule);color:var(--plate-dim);
+  font-size:var(--t-meta);transition:border-color .18s ease,color .18s ease;
+}
+.lc-toggle svg{width:13px;height:13px;flex:none;transition:transform .22s ease;}
+:root[data-theme="dark"] .lc-toggle svg{transform:rotate(180deg);}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lc-toggle svg{transform:rotate(180deg);}}
+
+/* ============================================================
+   7. STICKY DOCK
+   ============================================================ */
+/* The dock is hidden with visibility, not with a transform alone.
+   translateY(-101%) moves it out of sight but leaves its wordmark and
+   its theme control in the tab order and in the accessibility tree, so
+   a keyboard or VoiceOver reader met a second header that nobody could
+   see. visibility removes it from both.
+
+   Deliberately not transitioned. Delaying it by the length of the slide
+   so the dock could be watched leaving left both controls reachable for
+   those 200ms, which a real browser caught and a throttled one could
+   not. The dock slides in and goes at once, and there is never a moment
+   with two of anything, or none. */
+.lc-dock{
+  position:fixed;top:0;left:0;right:0;z-index:90;
+  background:var(--plate);color:var(--plate-ink);border-bottom:1px solid var(--plate-rule);
+  padding-top:env(safe-area-inset-top,0px);
+  padding-left:env(safe-area-inset-left,0px);
+  padding-right:env(safe-area-inset-right,0px);
+  transform:translateY(-101%);visibility:hidden;
+  transition:transform .2s ease;
+}
+.lc-dock.is-on{transform:none;visibility:visible;}
+@media (prefers-reduced-motion:reduce){
+  .lc-dock{transition:none;}
+}
+
+/* An expanded menu is a header. The dock is a header. Only one of them
+   is ever the header, so the dock stands down while the menu is open. */
+:root[data-lc-menu="open"] .lc-dock{transform:translateY(-101%);visibility:hidden;}
+
+/* While the dock carries the theme control, the header's own control
+   stands down. Both exist in the markup because they belong to two
+   different headers, but the reader and the screen reader are only ever
+   offered one: visibility takes it out of the tab order and out of the
+   accessibility tree as well as out of sight. The header is scrolled
+   away whenever this applies, so nothing visibly changes. */
+:root[data-lc-dock-state="on"] .lc-nav-end{visibility:hidden;}
+.lc-dock-in{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;height:3.1rem;}
+.lc-dock-l{display:flex;align-items:baseline;gap:.9rem;min-width:0;}
+.lc-dock-mark{
+  font-family:var(--serif);font-variation-settings:"opsz" 30,"wght" 380;
+  font-size:var(--t-compact);letter-spacing:-.026em;white-space:nowrap;text-transform:lowercase;
+}
+.lc-dock-mark i{color:var(--phil);font-style:normal;}
+.lc-dock-where{color:var(--desk,var(--plate-dim));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lc-dock-end{display:flex;align-items:center;gap:1.4rem;}
+.lc-dock-nav{display:flex;gap:1.3rem;}
+.lc-dock-nav a{font-size:var(--t-meta);color:var(--plate-dim);transition:color .18s ease;}
+.lc-dock-nav a[aria-current="page"]{color:var(--plate-ink);}
+.lc-dock .lc-toggle{min-height:1.9rem;padding:.2rem .5rem .2rem .38rem;}
+
+.lc-progress{position:fixed;top:0;left:0;right:0;height:1.5px;z-index:95;}
+.lc-progress i{display:block;height:100%;width:0;background:var(--accent);opacity:.6;}
+
+/* ============================================================
+   8. MEDIA
+   Every card image is 3:2 and the box is reserved before the
+   picture arrives, so nothing shifts when photography lands.
+   ============================================================ */
+.lc-media{margin:0;}
+.lc-frame{display:block;position:relative;aspect-ratio:3/2;overflow:hidden;background:var(--hair);}
+.lc-plate .lc-frame{background:var(--plate-hair);}
+.lc-frame img,.lc-frame canvas{width:100%;height:100%;object-fit:cover;}
+.lc-frame canvas{color:var(--ink);object-fit:fill;}
+.lc-plate .lc-frame canvas{color:var(--plate-ink);}
+.lc-mediacap{
+  margin-top:.8rem;
+  font-family:var(--sans);font-size:var(--t-meta);line-height:1.5;color:var(--plate-dim);
+}
+.lc-article .lc-mediacap{color:var(--dim);}
+.lc-mediacap a{border-bottom:1px solid var(--rule);}
+
+/* ============================================================
+   9. STORY COMPONENTS
+   Every card reads in the same order:
+   mono label, serif headline, serif deck, sans metadata.
+   ============================================================ */
+.lc-story{display:block;}
+.lc-story h2,.lc-story h3{
+  font-family:var(--serif);font-variation-settings:"opsz" 30,"wght" 400;
+  letter-spacing:-.014em;line-height:1.18;color:var(--ink);text-wrap:balance;font-weight:400;
+}
+.lc-story h2 span,.lc-story h3 span{
+  background-image:linear-gradient(var(--desk,var(--accent)),var(--desk,var(--accent)));
+  background-repeat:no-repeat;background-size:0% 1px;background-position:0 100%;
+  transition:background-size .2s ease;
+}
+.lc-plate .lc-story h2,.lc-plate .lc-story h3{color:var(--plate-ink);}
+.lc-story .lc-deck{margin-top:.5rem;}
+.lc-story-meta{display:block;margin-top:.6rem;font-family:var(--sans);font-size:var(--t-meta);color:var(--dim);font-variant-numeric:tabular-nums;}
+.lc-plate .lc-story-meta{color:var(--plate-dim);}
+
+.lc-story-text{display:block;min-width:0;}
+.lc-thumb{display:block;align-self:start;}
+
+.lc-story--feature{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.7fr);gap:clamp(1.4rem,3vw,2.6rem);align-items:start;}
+.lc-story--feature h3{font-size:var(--t-feature);font-variation-settings:"opsz" 48,"wght" 350;line-height:1.09;letter-spacing:-.02em;}
+.lc-story--feature .lc-deck{max-width:32rem;margin-top:.7rem;}
+.lc-story--feature .lc-label{margin-bottom:.7rem;}
+
+/* The picture column is minmax and not a fixed track. A reader who
+   scales text to 200% without scaling the page keeps a 768px viewport
+   and gets 32px rems, so a 5.5rem thumbnail becomes 176px inside a
+   210px column and the page went sideways. The maximum is the design;
+   the minimum only exists for the moment the design cannot have it. */
+.lc-story--standard{display:grid;grid-template-columns:minmax(0,1fr) minmax(3.5rem,9rem);gap:1.4rem;align-items:start;}
+.lc-story--standard h3{font-size:var(--t-headline);}
+.lc-story--standard .lc-label{margin-bottom:.45rem;}
+
+.lc-story--compact{display:grid;grid-template-columns:minmax(0,1fr) minmax(2.5rem,5.5rem);gap:1.1rem;align-items:start;}
+.lc-story--compact h3{font-size:var(--t-compact);font-variation-settings:"opsz" 20,"wght" 430;line-height:1.28;}
+.lc-story--compact .lc-label{margin-bottom:.35rem;}
+
+.lc-story--brief{display:grid;grid-template-columns:minmax(0,1fr) minmax(2.5rem,5.5rem);gap:1.1rem;align-items:start;}
+.lc-story--brief h3{font-size:var(--t-compact);font-variation-settings:"opsz" 20,"wght" 430;line-height:1.28;}
+.lc-story--brief .lc-label{margin-bottom:.25rem;}
+.lc-story--brief .lc-story-meta{margin-top:.45rem;}
+
+.lc-story--row{display:grid;grid-template-columns:minmax(0,1fr) minmax(2.4rem,5rem);gap:1.3rem;align-items:center;}
+.lc-row-in{display:grid;grid-template-columns:5rem minmax(0,1fr) 9.5rem;gap:.9rem clamp(1rem,2.4vw,1.9rem);align-items:baseline;}
+.lc-story--row h3{font-size:var(--t-compact);font-variation-settings:"opsz" 20,"wght" 430;line-height:1.28;}
+.lc-rmeta{text-align:right;}
+.lc-rmeta b{color:var(--desk,var(--accent));font-weight:600;}
+
+.lc-story--index{display:grid;grid-template-columns:minmax(0,1fr) minmax(3.5rem,9.5rem);gap:1.75rem;align-items:start;}
+
+/* ============================================================
+   10. HOMEPAGE
+   ============================================================ */
+.lc-band{padding:clamp(2.4rem,5.2vw,4rem) 0;}
+/* No rule between bands. Each module opens with a band head, and a
+   band head ends in a rule of its own: a second line 80px above it was
+   the same boundary drawn twice, once by the module that had finished
+   and once by the module beginning. The head owns it.
+
+   The Late Letter is the only module with no head, so it owns its own
+   boundary, on the front page and at the foot of a story alike. */
+#lc-late-letter{border-top:1px solid var(--rule);}
+.lc-band-head{
+  display:flex;align-items:baseline;justify-content:space-between;gap:1.25rem;flex-wrap:wrap;
+  padding-bottom:.85rem;border-bottom:1px solid var(--rule-strong);
+  margin-bottom:clamp(1.4rem,2.6vw,2rem);
+}
+.lc-band-head--spaced{margin-top:clamp(1.8rem,3.4vw,2.5rem);}
+.lc-band-head .lc-note{font-family:var(--sans);font-size:var(--t-meta);color:var(--dim);}
+/* h1 as well as h2, and the difference was visible: an archive and a
+   topic head their band with an h1, which had no rule at all and was
+   left to the browser. Two page types printed their title at 2em in
+   bold Instrument Sans, which is a size outside the scale and a voice
+   the journalism does not use. */
+.lc-band-head h1,.lc-band-head h2{
+  font-family:var(--serif);font-variation-settings:"opsz" 30,"wght" 430;
+  font-size:var(--t-headline);letter-spacing:-.016em;color:var(--ink);font-weight:400;
+}
+
+/* This week: one feature, two supporting, three briefs. The densities
+   are the editorial judgment; six equal cards would throw it away. */
+.lc-week{display:grid;gap:clamp(1.4rem,2.8vw,2rem);}
+.lc-week-support{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 clamp(1.5rem,3.4vw,2.8rem);
+  padding-top:clamp(1.4rem,2.8vw,2rem);border-top:1px solid var(--hair);
+}
+.lc-week-support > * + *{padding-left:clamp(1.5rem,3.4vw,2.8rem);border-left:1px solid var(--hair);}
+.lc-week-briefs{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 clamp(1.5rem,3.4vw,2.8rem);
+  padding-top:clamp(1.2rem,2.4vw,1.7rem);border-top:1px solid var(--hair);
+}
+.lc-week-briefs > * + *{padding-left:clamp(1.5rem,3.4vw,2.8rem);border-left:1px solid var(--hair);}
+
+.lc-rooms-intro{
+  max-width:44rem;margin-bottom:clamp(1.6rem,3vw,2.2rem);
+  font-family:var(--serif);font-variation-settings:"opsz" 24,"wght" 380;
+  font-size:var(--t-deck);line-height:1.55;color:var(--body);text-wrap:pretty;
+}
+.lc-rooms-intro b{color:var(--ink);font-weight:400;}
+.lc-rooms{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0;}
+.lc-room{padding-top:1.05rem;border-top:2px solid var(--desk);}
+.lc-room:first-child{padding-right:clamp(1.6rem,3.6vw,3.2rem);border-right:1px solid var(--rule);}
+.lc-room:last-child{padding-left:clamp(1.6rem,3.6vw,3.2rem);}
+.lc-room:only-child{padding-right:0;padding-left:0;border-right:0;}
+.lc-room-top{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;}
+/* The room heading has already said which desk this is, and the column
+   is narrow, so the label keeps only the story type. */
+.lc-room .lc-label .lc-sl{display:none;}
+.lc-room-q{
+  margin:.6rem 0 1.05rem;
+  font-family:var(--serif);font-style:italic;font-variation-settings:"opsz" 24,"wght" 330;
+  font-size:var(--t-compact);line-height:1.4;color:var(--dim);
+}
+.lc-room .lc-item{display:block;padding:1.15rem 0;border-bottom:1px solid var(--hair);}
+.lc-room .lc-item:last-of-type{border-bottom:0;}
+.lc-room-more{
+  display:inline-block;margin-top:1rem;min-height:2.75rem;line-height:2.75rem;
+  font-size:var(--t-meta);font-weight:500;color:var(--dim);
+  text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.3em;
+  text-decoration-color:var(--rule);
+  transition:color .18s ease,text-decoration-color .18s ease;
+}
+
+/* No top rule. The band head above already drew one 22px higher, and
+   two lines that close together are one boundary with two owners. The
+   rows below own their own separation. */
+.lc-latest .lc-item{display:block;padding:.95rem 0;border-bottom:1px solid var(--hair);}
+.lc-latest .lc-item:last-of-type{border-bottom:0;}
+
+/* ============================================================
+   11. PLATE CONTENT: LEAD AND DESK
+   ============================================================ */
+.lc-plate-body{padding:clamp(1.8rem,4.4vw,3.1rem) 0 clamp(1.9rem,4.4vw,3.1rem);}
+
+.lc-lead{display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);gap:clamp(1.6rem,3.6vw,3.2rem);align-items:center;}
+.lc-lead .lc-label{margin-bottom:1rem;}
+.lc-lead h1{
+  font-family:var(--serif);font-variation-settings:"opsz" 72,"wght" 330;
+  font-size:var(--t-h1);line-height:1.02;letter-spacing:-.026em;
+  color:var(--plate-ink);text-wrap:balance;font-weight:400;
+}
+.lc-lead .lc-deck{margin-top:1.1rem;max-width:33rem;font-size:var(--t-body);line-height:1.52;}
+.lc-byline{
+  display:flex;align-items:center;flex-wrap:wrap;gap:.5rem .7rem;
+  margin-top:1.4rem;font-family:var(--sans);font-size:var(--t-meta);
+  color:var(--plate-dim);font-variant-numeric:tabular-nums;
+}
+.lc-byline .lc-who{color:var(--plate-ink);}
+.lc-byline .lc-sep{width:3px;height:3px;background:currentColor;opacity:.4;flex:none;}
+.lc-readlink{
+  display:inline-block;margin-top:1.35rem;font-size:var(--t-meta);font-weight:500;color:var(--plate-ink);
+  border-bottom:1px solid var(--desk,var(--accent));padding-bottom:.3rem;transition:opacity .18s ease;
+}
+
+.lc-deskhead{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,25rem);gap:1.1rem clamp(2rem,5vw,4rem);align-items:end;}
+.lc-deskhead h1{
+  font-family:var(--serif);font-variation-settings:"opsz" 72,"wght" 330;
+  font-size:clamp(2.1rem,5.2vw,3.5rem);line-height:1;letter-spacing:-.028em;color:var(--plate-ink);font-weight:400;
+}
+.lc-desk-q{
+  margin-top:.7rem;font-family:var(--serif);font-style:italic;
+  font-variation-settings:"opsz" 30,"wght" 320;font-size:var(--t-headline);color:var(--desk);
+}
+.lc-desk-purpose{
+  font-family:var(--serif);font-variation-settings:"opsz" 18,"wght" 400;
+  font-size:var(--t-deck);line-height:1.55;color:var(--plate-dim);padding-bottom:.3rem;text-wrap:pretty;
+}
+.lc-deskfeature{
+  display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);
+  gap:clamp(1.6rem,3.6vw,3.2rem);align-items:center;
+  margin-top:clamp(1.5rem,3.4vw,2.4rem);padding-top:clamp(1.4rem,3vw,2rem);
+  border-top:1px solid var(--plate-rule);
+}
+.lc-deskfeature h2{
+  font-family:var(--serif);font-variation-settings:"opsz" 48,"wght" 340;
+  font-size:var(--t-feature);line-height:1.08;letter-spacing:-.022em;color:var(--plate-ink);
+  text-wrap:balance;font-weight:400;
+}
+.lc-deskfeature .lc-deck{margin-top:.8rem;max-width:31rem;}
+
+/* ============================================================
+   12. DESK ARCHIVES
+   An index in a publication, not a grid of blog cards.
+   ============================================================ */
+/* Folios are a printed counter, not content: a CSS counter gives them
+   the leading zero without a helper Ghost does not have, and page one
+   is therefore correct with no JavaScript at all. Later pages get
+   their offset from main.js, because the numbers are decoration and
+   nothing depends on them. */
+/* Same again, and the last row draws no line either: the pager below
+   owns the bottom of the index. With one story in it the archive used to
+   print four rules for a single headline. */
+.lc-index{counter-reset:lc-folio;}
+.lc-index .lc-item{display:block;padding:1.5rem 0;border-bottom:1px solid var(--hair);counter-increment:lc-folio;}
+.lc-index .lc-item:last-of-type{border-bottom:0;}
+.lc-irow{display:grid;grid-template-columns:2.75rem minmax(0,1fr) 8.5rem;gap:.45rem clamp(1rem,2.2vw,1.6rem);align-items:baseline;}
+.lc-folio{font-family:var(--sans);font-size:var(--t-meta);color:var(--dim);font-variant-numeric:tabular-nums;padding-top:.3rem;}
+.lc-folio::before{content:counter(lc-folio,decimal-leading-zero);}
+/* the index card takes its heading level from the page it is on, so
+   both are set here rather than only the one that happened to be used */
+.lc-index .lc-story h2,.lc-index .lc-story h3{font-size:var(--t-feature);}
+
+/* ============================================================
+   13. ARTICLES
+   ============================================================ */
+.lc-article{padding:clamp(2rem,4.4vw,3.2rem) 0 clamp(2rem,4vw,3rem);}
+
+/* THE STORY COLUMN IS CENTRED IN THE PAGE.
+
+   It used to sit flush against the left of the publication wrap, which
+   is right for an index, where the eye runs down a list, and wrong for
+   a story, where it runs across a line and back. At a desk width that
+   left six hundred pixels of empty page on the right of every
+   paragraph and the reader was working in the corner of the screen.
+
+   Every part of the story takes the same measure and the same auto
+   margins, so the label, the headline, the deck, the byline, the
+   photograph, the prose and the postscript all hang on one axis. The
+   editor's wide and full width cards are the only things allowed out
+   of it, and they now break out symmetrically: see the Koenig block. */
+.lc-art-head{width:min(100%,var(--measure));margin-inline:auto;}
+.lc-art-head .lc-label{margin-bottom:1rem;}
+.lc-art-head h1{
+  font-family:var(--serif);font-variation-settings:"opsz" 72,"wght" 340;
+  font-size:var(--t-h1);line-height:1.04;letter-spacing:-.026em;color:var(--ink);
+  text-wrap:balance;font-weight:400;
+}
+.lc-art-head .lc-deck{
+  margin-top:1rem;font-variation-settings:"opsz" 24,"wght" 350;
+  font-size:var(--t-body);line-height:1.5;color:var(--body);
+}
+.lc-art-meta{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:.45rem 1.1rem;
+  margin-top:1.45rem;padding-top:.95rem;border-top:1px solid var(--rule-strong);
+  font-family:var(--sans);font-size:var(--t-meta);color:var(--dim);font-variant-numeric:tabular-nums;
+}
+.lc-art-meta > * + *::before{content:"\0000B7";margin-right:.7rem;color:var(--rule);}
+.lc-art-meta .lc-by{color:var(--ink);}
+.lc-art-meta .lc-by a{border-bottom:1px solid var(--rule);}
+.lc-art-meta .lc-upd{color:var(--desk,var(--accent));}
+.lc-art-media{width:min(100%,var(--measure));margin-inline:auto;margin-top:clamp(1.5rem,2.8vw,2.1rem);}
+.lc-art-media .lc-frame{aspect-ratio:auto;background:none;}
+.lc-art-media .lc-frame img{height:auto;object-fit:contain;}
+
+/* the opening letter and the closing stop carry the wordmark's red, so
+   a story opens and closes on the publication's own mark */
+.lc-stop{color:var(--phil);}
+
+.lc-art-end{width:min(100%,var(--measure));margin-inline:auto;margin-top:2.6rem;}
+/* The author card above has already drawn the one rule that says the
+   journalism has ended. Filed under is part of the same postscript, so
+   it is spaced from the card rather than divided from it. */
+.lc-topics{margin-top:1.7rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:baseline;}
+.lc-topics .lc-lbl{font-family:var(--sans);font-size:var(--t-label);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-right:.35rem;}
+.lc-topics a{font-family:var(--sans);font-size:var(--t-meta);color:var(--body);border-bottom:1px solid var(--rule);padding-bottom:.15rem;transition:color .18s ease,border-color .18s ease;}
+
+/* The second divider in the postscript, and deliberately lighter than
+   the first: leaving the journalism is the stronger of the two. */
+.lc-related{margin-top:2.4rem;padding-top:1.1rem;border-top:1px solid var(--rule);}
+.lc-related h2{
+  margin-bottom:.3rem;
+  font-family:var(--serif);font-variation-settings:"opsz" 30,"wght" 430;
+  font-size:var(--t-headline);letter-spacing:-.016em;color:var(--ink);font-weight:400;
+}
+/* Cards, not rows: each carries a picture, a classification and a
+   headline, and three of them stacked read as three stories without
+   being ruled off from one another. */
+.lc-related .lc-item{display:block;padding:1.5rem 0 0;}
+
+/* ============================================================
+   14. EDITOR CONTENT AND KOENIG CARDS
+   Content written in the editor carries no classes of ours, so it
+   is styled by element. Ghost's own cards are styled by their kg-
+   classes, and never reset in a way that breaks them.
+   ============================================================ */
+.lc-prose{width:min(100%,var(--measure));margin-inline:auto;margin-top:clamp(1.5rem,2.8vw,2.2rem);counter-reset:lc-section;}
+.lc-prose > p,
+.lc-prose > blockquote p{
+  font-family:var(--serif);font-variation-settings:"opsz" 16,"wght" 400;
+  font-size:var(--t-body);line-height:1.72;color:var(--body);text-wrap:pretty;
+}
+.lc-prose > p{margin-bottom:1.45rem;}
+.lc-prose > p:last-child{margin-bottom:0;}
+
+/* The drop cap sinks two lines, not three. Three is a display letter:
+   it takes a fifth of the opening paragraph, and on a screen, where
+   the column is shorter than a printed one, it reads as an ornament
+   that has to be got past before the story starts. Two lines is the
+   ordinary magazine sink. It still says here is the beginning, and it
+   says it at the size of the text it belongs to.
+
+   The cap sinks inside its own paragraph so it can never leak into the
+   next one. Firefox has no initial-letter, so a float sits behind
+   @supports, and main.js raises the cap on a short opening. */
+.lc-prose > p.lc-cap::first-letter{
+  font-family:var(--serif);font-size:2.6em;line-height:.82;color:var(--phil);
+  font-variation-settings:"opsz" 72,"wght" 400;
+  -webkit-initial-letter:2;initial-letter:2;margin-right:.075em;
+}
+@supports not (initial-letter:2){
+  @supports not (-webkit-initial-letter:2){
+    .lc-prose > p.lc-cap::first-letter{float:left;padding:.06em .075em 0 0;}
+  }
+}
+/* An opening too short to wrap around a sunk cap gets a raised one,
+   and it is stepped down with the sunk cap so the two read as the
+   same letter at the same volume. */
+.lc-prose > p.lc-cap-raise::first-letter{
+  font-family:var(--serif);font-size:1.9em;line-height:1;color:var(--phil);
+  font-variation-settings:"opsz" 72,"wght" 400;
+}
+
+/* SUBHEADS, AND HOW A READER FINDS THEIR PLACE IN A LONG STORY.
+
+   A desk coloured rule used to sit above every subhead. It was drawn
+   in the reading column, directly in the path of the eye, and it
+   announced the heading a line before the heading did: the same
+   boundary stated twice, in a colour loud enough to be read as the
+   start of something rather than the join between two parts of one
+   argument. A story with eight sections came out striped.
+
+   What replaces it is not decoration but a folio. Sections are
+   numbered in the margin, in the mono the publication already uses
+   for a classification and for the numbers down the archive, at the
+   size of a caption and in the colour of metadata. It sits outside
+   the column, so a reader going down the page never reads it and
+   never has to step over it; it is there for the reader who is
+   scanning back for where an argument turned, and it tells them how
+   far through the piece they are.
+
+   The heading itself is left to do the announcing, with the section
+   step in the spacing scale above it and a little more weight in the
+   face. This is what the standing documents already do, and those
+   pages have been the calmer reading for it.
+
+   Narrow screens have no margin to hang anything in, so the folio
+   moves inside the column as a hanging indent beside the heading. It
+   is the same mark in the only other place it can go, and the prose
+   still runs flush.
+
+   Numbering costs nothing when it is right and misleads when it is
+   wrong, so a story with a single subhead is not numbered at all:
+   :has() asks for a second h2 before any of this applies. Where
+   :has() is not supported nothing is numbered, and the spacing alone
+   carries the boundary. */
+.lc-prose h2{
+  margin:3.3rem 0 1rem;
+  font-family:var(--serif);font-variation-settings:"opsz" 30,"wght" 540;
+  font-size:var(--t-headline);line-height:1.25;letter-spacing:-.016em;color:var(--ink);font-weight:500;
+  /* a heading reached from a link clears the dock instead of landing
+     underneath it */
+  scroll-margin-top:calc(var(--lc-dock-h) + 1.1rem);
+}
+.lc-prose > h2:first-child{margin-top:0;}
+.lc-prose:has(> h2 ~ h2) > h2{position:relative;counter-increment:lc-section;padding-left:2.3rem;}
+.lc-prose:has(> h2 ~ h2) > h2::before{
+  content:counter(lc-section,decimal-leading-zero);
+  position:absolute;left:0;top:.34em;
+  font-family:var(--mono);font-size:var(--t-label);font-weight:500;letter-spacing:.08em;
+  color:var(--dim);font-variant-numeric:tabular-nums;
+}
+/* Above the phone breakpoint the column stops filling the page and a
+   margin opens on either side of it: the folio leaves the column and
+   the heading goes back to sitting flush with the prose it
+   introduces. 761px is where the rest of the theme recomposes too. */
+@media screen and (min-width:761px){
+  .lc-prose:has(> h2 ~ h2) > h2{padding-left:0;}
+  .lc-prose:has(> h2 ~ h2) > h2::before{left:auto;right:100%;margin-right:1.7rem;}
+}
+.lc-prose h3{
+  margin:2rem 0 .8rem;
+  font-family:var(--serif);font-variation-settings:"opsz" 24,"wght" 500;
+  font-size:var(--t-compact);line-height:1.3;color:var(--ink);font-weight:500;
+}
+.lc-prose h4,.lc-prose h5,.lc-prose h6{
+  margin:1.7rem 0 .6rem;
+  font-family:var(--sans);font-size:var(--t-label);font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--dim);
+}
+
+/* Lists are never laid out with grid or flex: Ghost puts inline
+   elements straight into the li and a grid would blockify each one
+   onto its own row. The marker is positioned instead. */
+.lc-prose ul,.lc-prose ol{margin:0 0 1.45rem;padding:0;list-style:none;counter-reset:lc-li;}
+.lc-prose li{
+  position:relative;padding-left:1.6rem;margin-bottom:.65rem;
+  font-family:var(--serif);font-variation-settings:"opsz" 16,"wght" 400;
+  font-size:var(--t-body);line-height:1.66;color:var(--body);
+}
+.lc-prose li:last-child{margin-bottom:0;}
+.lc-prose ul > li::before{content:"";position:absolute;left:0;top:.68em;width:5px;height:5px;background:var(--desk,var(--accent));}
+.lc-prose ol > li{counter-increment:lc-li;}
+.lc-prose ol > li::before{
+  content:counter(lc-li);position:absolute;left:0;top:.35em;
+  font-family:var(--sans);font-size:var(--t-meta);color:var(--dim);font-variant-numeric:tabular-nums;
+}
+.lc-prose li > ul,.lc-prose li > ol{margin:.65rem 0 0;}
+
+.lc-prose a{color:var(--ink);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.18em;text-decoration-color:var(--desk,var(--accent));transition:color .18s ease;}
+.lc-prose strong{color:var(--ink);font-weight:600;}
+.lc-prose em{font-style:italic;}
+/* An hr the author wrote is a pause in the writing, not a boundary
+   the theme drew. Short and centred, so it reads as one. */
+.lc-prose hr{width:4.5rem;margin:2.6rem auto;border:0;border-top:1px solid var(--rule);}
+.lc-prose code{font-family:var(--mono);font-size:.9em;background:var(--hair);padding:.1em .35em;}
+.lc-prose pre{margin:0 0 1.45rem;padding:1.1rem 1.25rem;overflow-x:auto;background:var(--plate);color:var(--plate-ink);font-family:var(--mono);font-size:var(--t-meta);line-height:1.6;}
+.lc-prose pre code{background:none;padding:0;color:inherit;}
+
+/* An ordinary blockquote is quiet; the editor's alternative blockquote
+   is the pull quote.
+
+   The type is set on the blockquote itself, not on a paragraph inside
+   it. Ghost's editor emits <blockquote>text</blockquote> with no
+   paragraph at all, so styling only the p left every pulled quote in
+   the sans utility face at 16px: the journalism set in the interface
+   voice. The p rule stays and inherits, because an HTML card or a
+   Markdown card does wrap the text in one. */
+.lc-prose blockquote{
+  margin:0 0 1.45rem;padding-left:1.3rem;border-left:1px solid var(--rule);
+  font-family:var(--serif);font-variation-settings:"opsz" 16,"wght" 400;
+  font-size:var(--t-compact);line-height:1.6;color:var(--dim);
+}
+.lc-prose blockquote p{font:inherit;color:inherit;margin:0 0 .8rem;}
+.lc-prose blockquote p:last-child{margin-bottom:0;}
+
+.lc-prose blockquote.kg-blockquote-alt,
+.lc-prose .lc-pullquote,
+.lc-doc-main blockquote.kg-blockquote-alt,
+.lc-doc-main .lc-pullquote{
+  margin:2.1rem 0;padding:1.35rem 0;border:0;
+  border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);
+  font-family:var(--serif);font-style:italic;font-variation-settings:"opsz" 36,"wght" 320;
+  font-size:var(--t-feature);line-height:1.34;letter-spacing:-.012em;color:var(--ink);text-wrap:balance;
+  /* Flush left, like everything else in the column. Ghost ships its own
+     rule for this class, loaded after this stylesheet, which centres the
+     quote and pads it 2.5em in from each side. Every property that rule
+     sets is set here; text-align was the one this block did not name,
+     so it came through, and a pull quote made in the editor stood in
+     the middle of the column where the design had it on the left edge.
+     A document page gets the same block, rather than half of Ghost's. */
+  text-align:left;
+}
+.lc-prose blockquote.kg-blockquote-alt p,
+.lc-prose .lc-pullquote p,
+.lc-doc-main blockquote.kg-blockquote-alt p,
+.lc-doc-main .lc-pullquote p{font:inherit;color:inherit;letter-spacing:inherit;margin:0;}
+
+/* a short reporting note set beside the prose */
+.lc-srcnote{
+  margin:0 0 1.45rem;padding-left:1.1rem;border-left:2px solid var(--rule);
+  font-family:var(--sans);font-size:var(--t-meta);line-height:1.65;color:var(--dim);
+}
+
+/* Tables: quiet sans utility text, scrolling rather than overflowing.
+
+   A bare table, which is what a Markdown card makes, is a scrolling
+   block, because nothing wraps it and it must never push the page
+   sideways. The price is that it only ever measures its own content,
+   and its caption wraps to that width.
+
+   Inside <div class="lc-table">, which the manual tells an editor to
+   type in an HTML card, the wrapper does the scrolling and the table is
+   a table again: it runs the full width of the column, and its caption
+   with it. */
+.lc-prose table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;margin:0 0 1.6rem;display:block;overflow-x:auto;}
+.lc-table{margin:0 0 1.6rem;overflow-x:auto;}
+.lc-prose .lc-table table,.lc-doc-main .lc-table table{display:table;margin:0;overflow:visible;}
+.lc-prose caption,.lc-doc-main caption{
+  caption-side:top;text-align:left;padding-bottom:.65rem;
+  font-family:var(--sans);font-size:var(--t-label);font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--dim);
+}
+.lc-prose th,.lc-prose td{
+  padding:.6rem .9rem .6rem 0;text-align:left;border-bottom:1px solid var(--hair);
+  font-family:var(--sans);font-size:var(--t-meta);line-height:1.45;color:var(--body);
+}
+.lc-prose thead th{border-bottom-color:var(--rule-strong);color:var(--ink);font-weight:600;}
+/* The last row draws no line under any of its cells. Resetting only
+   the td left a row header, a th with scope="row", holding its own
+   hairline: a short stray rule under the first column alone. */
+.lc-prose tbody tr:last-child > *{border-bottom:0;}
+/* a row header names its row; it is set like the cells, not like a
+   second header row */
+.lc-prose tbody th{font-weight:400;}
+
+/* --- Koenig cards -------------------------------------------------
+   Two rules govern this block.
+
+   1. .kg-width-wide and .kg-width-full must exist as standalone
+      selectors at the start of a line, or gscan reports GS050-CSS and
+      Ghost's uploader refuses the theme. Scoping them under .lc-prose
+      does not count. Both are bounded to the viewport, so neither can
+      scroll the page sideways.
+
+   2. Everything else is scoped, because Ghost injects its own
+      cards.min.css through {{ghost_head}}, which loads after this
+      file. At equal specificity Ghost wins, and the button card came
+      out in the browser's system font rather than Instrument Sans.
+      One extra class is enough to settle it. */
+/* margin-block, never the shorthand: the shorthand also sets the
+   inline margins, which is how a wide card lost the offset that pulls
+   it out of the reading column and quietly went back to sitting on
+   top of it. */
+.lc-prose .kg-card,.lc-doc-main .kg-card{margin-block:0 1.6rem;}
+.lc-prose .kg-card:last-child,.lc-doc-main .kg-card:last-child{margin-bottom:0;}
+.lc-prose figure.kg-card img,.lc-doc-main figure.kg-card img{width:100%;}
+
+/* The reading column is centred in the page, so a card breaks out of
+   it symmetrically: half its own width to the left of the column's
+   centre line. 50% is half the column, because a percentage margin
+   resolves against the containing block, and the column is the
+   containing block. The card comes out centred on the same axis as
+   the prose above and below it.
+
+   Wide takes --breakout. Full runs to the gutters. On a narrow screen
+   both are the width of the wrap, both margins compute to nothing and
+   the two are the same card, which is correct. */
+.kg-width-wide{
+  width:var(--breakout);max-width:var(--breakout);
+  margin-inline:calc(50% - (var(--breakout) / 2));
+}
+.kg-width-full{
+  width:calc(100vw - (var(--lc-edge) * 2));max-width:calc(100vw - (var(--lc-edge) * 2));
+  margin-inline:calc(50% - ((100vw - (var(--lc-edge) * 2)) / 2));
+}
+.kg-width-wide img,.kg-width-full img{width:100%;}
+
+/* A document page is not a story: its main column sits beside a
+   contents column rather than in the middle of the page, and a card
+   centred on it would hang over the contents and off the wrap. On a
+   page, wide and full simply fill the column they are written in. */
+.lc-doc-main .kg-width-wide,.lc-doc-main .kg-width-full{
+  width:100%;max-width:100%;margin-inline:0;
+}
+
+.lc-prose .kg-card figcaption,.lc-doc-main .kg-card figcaption,
+.lc-prose figcaption{
+  margin-top:.8rem;
+  font-family:var(--sans);font-size:var(--t-meta);line-height:1.5;color:var(--dim);text-align:left;
+}
+.lc-prose .kg-card figcaption a,.lc-doc-main .kg-card figcaption a{color:var(--ink);text-decoration:underline;}
+
+.lc-prose .kg-image-card img,.lc-doc-main .kg-image-card img{width:100%;}
+
+.lc-prose .kg-gallery-container,.lc-doc-main .kg-gallery-container{display:flex;flex-direction:column;}
+.lc-prose .kg-gallery-row,.lc-doc-main .kg-gallery-row{display:flex;flex-direction:row;justify-content:center;}
+.lc-prose .kg-gallery-image img,.lc-doc-main .kg-gallery-image img{display:block;margin:0;width:100%;height:100%;}
+.lc-prose .kg-gallery-row:not(:first-of-type),.lc-doc-main .kg-gallery-row:not(:first-of-type){margin:.5rem 0 0;}
+.lc-prose .kg-gallery-image:not(:first-of-type),.lc-doc-main .kg-gallery-image:not(:first-of-type){margin:0 0 0 .5rem;}
+
+.lc-prose .kg-bookmark-card,.lc-doc-main .kg-bookmark-card{width:100%;}
+.lc-prose .kg-bookmark-container,.lc-doc-main .kg-bookmark-container{
+  display:flex;min-height:120px;color:inherit;text-decoration:none;
+  border:1px solid var(--rule);
+}
+.lc-prose .kg-bookmark-content,.lc-doc-main .kg-bookmark-content{flex-grow:1;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;padding:1.1rem 1.25rem;}
+.lc-prose .kg-bookmark-title,.lc-doc-main .kg-bookmark-title{font-family:var(--sans);font-size:var(--t-meta);font-weight:600;color:var(--ink);}
+.lc-prose .kg-bookmark-description,.lc-doc-main .kg-bookmark-description{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  margin-top:.4rem;font-family:var(--sans);font-size:var(--t-meta);line-height:1.5;color:var(--dim);
+}
+.lc-prose .kg-bookmark-metadata,.lc-doc-main .kg-bookmark-metadata{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem;margin-top:.75rem;font-family:var(--sans);font-size:var(--t-label);color:var(--dim);}
+.lc-prose .kg-bookmark-icon,.lc-doc-main .kg-bookmark-icon{width:18px;height:18px;margin-right:.25rem;}
+.lc-prose .kg-bookmark-thumbnail,.lc-doc-main .kg-bookmark-thumbnail{position:relative;min-width:33%;max-height:100%;}
+.lc-prose .kg-bookmark-thumbnail img,.lc-doc-main .kg-bookmark-thumbnail img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.lc-prose .kg-bookmark-author,.lc-doc-main .kg-bookmark-author,.lc-prose .kg-bookmark-publisher,.lc-doc-main .kg-bookmark-publisher{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+.lc-prose .kg-embed-card,.lc-doc-main .kg-embed-card{display:flex;flex-direction:column;align-items:center;width:100%;}
+.lc-prose .kg-embed-card iframe,.lc-doc-main .kg-embed-card iframe{max-width:100%;}
+
+.lc-prose .kg-button-card,.lc-doc-main .kg-button-card{display:flex;}
+.lc-prose .kg-button-card.kg-align-center,.lc-doc-main .kg-button-card.kg-align-center{justify-content:center;}
+.lc-prose .kg-btn,.lc-doc-main .kg-btn{
+  display:inline-flex;align-items:center;justify-content:center;min-height:2.75rem;
+  padding:.6rem 1.5rem;border:1px solid var(--ink);
+  font-family:var(--sans);font-size:var(--t-meta);font-weight:600;
+  letter-spacing:.06em;color:var(--ink);transition:background .18s ease,color .18s ease;
+}
+.lc-prose .kg-btn-accent,.lc-doc-main .kg-btn-accent{background:var(--ink);color:var(--paper);}
+
+.lc-prose .kg-callout-card,.lc-doc-main .kg-callout-card{display:flex;gap:.9rem;padding:1.1rem 1.25rem;border-left:2px solid var(--rule);background:none;}
+.lc-prose .kg-callout-emoji,.lc-doc-main .kg-callout-emoji{font-size:var(--t-compact);line-height:1.5;}
+.lc-prose .kg-callout-text,.lc-doc-main .kg-callout-text{font-family:var(--sans);font-size:var(--t-meta);line-height:1.7;color:var(--body);}
+.lc-prose .kg-callout-card-red,.lc-doc-main .kg-callout-card-red{border-left-color:var(--phil);}
+.lc-prose .kg-callout-card-blue,.lc-doc-main .kg-callout-card-blue{border-left-color:var(--tech);}
+
+.lc-prose .kg-toggle-card,.lc-doc-main .kg-toggle-card{border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);padding:1rem 0;}
+/* two toggles in a row share the line between them */
+.lc-prose .kg-toggle-card + .kg-toggle-card,.lc-doc-main .kg-toggle-card + .kg-toggle-card{border-top:0;}
+.lc-prose .kg-toggle-heading,.lc-doc-main .kg-toggle-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;cursor:pointer;}
+.lc-prose .kg-toggle-heading-text,.lc-doc-main .kg-toggle-heading-text{font-family:var(--serif);font-variation-settings:"opsz" 24,"wght" 500;font-size:var(--t-compact);color:var(--ink);}
+.lc-prose .kg-toggle-card-icon,.lc-doc-main .kg-toggle-card-icon{width:14px;height:14px;flex:none;margin-top:.35rem;transition:transform .2s ease;}
+.lc-prose .kg-toggle-card[data-kg-toggle-state="open"] .kg-toggle-card-icon,.lc-doc-main .kg-toggle-card[data-kg-toggle-state="open"] .kg-toggle-card-icon{transform:rotate(180deg);}
+.lc-prose .kg-toggle-content,.lc-doc-main .kg-toggle-content{font-family:var(--serif);font-size:var(--t-compact);line-height:1.65;color:var(--body);}
+.lc-prose .kg-toggle-card[data-kg-toggle-state="close"] .kg-toggle-content,.lc-doc-main .kg-toggle-card[data-kg-toggle-state="close"] .kg-toggle-content{display:none;}
+.lc-prose .kg-toggle-card[data-kg-toggle-state="open"] .kg-toggle-content,.lc-doc-main .kg-toggle-card[data-kg-toggle-state="open"] .kg-toggle-content{margin-top:.8rem;}
+
+.lc-prose .kg-header-card,.lc-doc-main .kg-header-card{padding:clamp(2rem,5vw,3.5rem) 1.25rem;text-align:center;}
+.lc-prose .kg-header-card h2,.lc-doc-main .kg-header-card h2,.lc-prose .kg-header-card .kg-header-card-header,.lc-doc-main .kg-header-card .kg-header-card-header{
+  font-family:var(--serif);font-variation-settings:"opsz" 48,"wght" 340;
+  font-size:var(--t-feature);line-height:1.15;color:var(--ink);font-weight:400;
+}
+.lc-prose .kg-header-card h3,.lc-doc-main .kg-header-card h3,.lc-prose .kg-header-card .kg-header-card-subheader,.lc-doc-main .kg-header-card .kg-header-card-subheader{
+  margin-top:.7rem;font-family:var(--sans);font-size:var(--t-meta);color:var(--dim);font-weight:400;
+}
+
+.lc-prose .kg-product-card-container,.lc-doc-main .kg-product-card-container{border:1px solid var(--rule);padding:1.25rem;}
+.lc-prose .kg-product-card-title,.lc-doc-main .kg-product-card-title{font-family:var(--serif);font-size:var(--t-compact);color:var(--ink);}
+.lc-prose .kg-product-card-description,.lc-doc-main .kg-product-card-description{font-family:var(--sans);font-size:var(--t-meta);color:var(--body);}
+
+.lc-prose .kg-file-card-container,.lc-doc-main .kg-file-card-container{display:flex;align-items:center;gap:1rem;border:1px solid var(--rule);padding:1rem 1.25rem;}
+.lc-prose .kg-file-card-title,.lc-doc-main .kg-file-card-title{font-family:var(--sans);font-size:var(--t-meta);font-weight:600;color:var(--ink);}
+.lc-prose .kg-file-card-caption,.lc-doc-main .kg-file-card-caption{font-family:var(--sans);font-size:var(--t-label);color:var(--dim);}
+
+.lc-prose .kg-audio-card,.lc-doc-main .kg-audio-card,.lc-prose .kg-video-card,.lc-doc-main .kg-video-card{margin-bottom:1.6rem;}
+
+/* The audio player is the one card Ghost paints white outright: a
+   rounded white box with #222 text and a grey time, which on the dark
+   paper is a hole in the page and, in either theme, a duration at 2.29
+   to 1. Only its surface is changed. Every control, every slider and
+   the whole of its behaviour stay Ghost's. */
+.lc-prose .kg-audio-card,.lc-doc-main .kg-audio-card{
+  background:none;color:var(--ink);border-radius:0;
+  box-shadow:none;border:1px solid var(--rule);
+  font-family:var(--sans);
+}
+.lc-prose .kg-audio-card .kg-audio-thumbnail,.lc-doc-main .kg-audio-card .kg-audio-thumbnail{border-radius:0;}
+.lc-prose .kg-audio-card .kg-audio-title,.lc-doc-main .kg-audio-card .kg-audio-title{color:var(--ink);}
+.lc-prose .kg-audio-card .kg-audio-time,.lc-doc-main .kg-audio-card .kg-audio-time{color:var(--dim);}
+
+/* Ghost renders its own signup card; keep it inside the measure and
+   let its own styles do the rest. */
+.lc-prose .kg-signup-card,.lc-doc-main .kg-signup-card{margin:2rem 0;}
+
+/* --- reconciling with Ghost's own card styles ---------------------
+   cards.min.css is written for a generic theme: it rounds corners at
+   6 and 8px and paints several cards white. Rounded white boxes are
+   not this publication's language, and a white card on the dark paper
+   is a hole in the page rather than a card.
+
+   These selectors match Ghost's own shape, one class deeper, because
+   several of its rules are .kg-x a.kg-y and would otherwise win. Only
+   presentation changes. Nothing here touches how a card works, and the
+   audio and video players keep their own internals. */
+.lc-prose .kg-callout-card,.lc-doc-main .kg-callout-card,
+.lc-prose .kg-bookmark-card a.kg-bookmark-container,.lc-doc-main .kg-bookmark-card a.kg-bookmark-container,
+.lc-prose .kg-button-card a.kg-btn,.lc-doc-main .kg-button-card a.kg-btn,
+.lc-prose .kg-file-card a.kg-file-card-container,.lc-doc-main .kg-file-card a.kg-file-card-container{
+  border-radius:0;
+}
+.lc-prose .kg-bookmark-card a.kg-bookmark-container,.lc-doc-main .kg-bookmark-card a.kg-bookmark-container,
+.lc-prose .kg-file-card a.kg-file-card-container,.lc-doc-main .kg-file-card a.kg-file-card-container{
+  background:none;color:inherit;border:1px solid var(--rule);box-shadow:none;
+}
+.lc-prose .kg-bookmark-thumbnail img,.lc-doc-main .kg-bookmark-thumbnail img{border-radius:0;}
+/* Ghost prints the secondary line of several cards at 50 to 70 per
+   cent opacity, which is written for its own near black on white. Over
+   this publication's greys it took them to 2.87 to 1 on paper and 3.21
+   to 1 in the dark. The colour is already the quiet one; the opacity
+   was quieting it twice. Every card that does it is listed, not only
+   the ones the fixture happens to carry. */
+.lc-prose .kg-bookmark-description,.lc-doc-main .kg-bookmark-description,
+.lc-prose .kg-bookmark-metadata > *,.lc-doc-main .kg-bookmark-metadata > *,
+.lc-prose .kg-file-card-caption,.lc-doc-main .kg-file-card-caption,
+.lc-prose .kg-file-card-filesize,.lc-doc-main .kg-file-card-filesize,
+.lc-prose .kg-collection-card-post-meta,.lc-doc-main .kg-collection-card-post-meta,
+.lc-prose .kg-product-card-description p,.lc-doc-main .kg-product-card-description p,
+.lc-prose .kg-product-card-description li,.lc-doc-main .kg-product-card-description li{opacity:1;}
+.lc-prose .kg-button-card a.kg-btn,.lc-doc-main .kg-button-card a.kg-btn{
+  height:auto;min-height:2.75rem;padding:.6rem 1.5rem;
+  font-family:var(--sans);font-size:var(--t-meta);font-weight:600;letter-spacing:.06em;
+  border:1px solid var(--ink);background:none;color:var(--ink);
+}
+.lc-prose .kg-button-card a.kg-btn-accent,.lc-doc-main .kg-button-card a.kg-btn-accent{
+  background:var(--ink);color:var(--paper);
+}
+
+/* ============================================================
+   15. TRUST BLOCKS
+   Reporting notes, corrections and disclosures. The editor writes
+   them with a documented HTML card; the theme never invents one.
+   ============================================================ */
+.lc-trust{width:min(100%,var(--measure));margin-inline:auto;margin-top:1.9rem;padding-top:1.15rem;border-top:1px solid var(--hair);}
+.lc-trust + .lc-trust{margin-top:1.3rem;}
+.lc-trust h2,.lc-trust h3{
+  margin:0 0 .55rem;
+  font-family:var(--serif);font-variation-settings:"opsz" 24,"wght" 500;
+  font-size:var(--t-compact);letter-spacing:-.01em;color:var(--ink);font-weight:500;
+}
+/* a trust block is written in the editor's HTML card, so it lands
+   inside the prose. It is not a section of the story and is never
+   numbered as one: the folio counts subheads, and the counter only
+   ever reaches a direct child of the prose, but a note nested one
+   level deeper should not print a marker of any kind either. */
+.lc-trust h2::before,.lc-trust h3::before{content:none;display:none;}
+.lc-trust p{font-family:var(--sans);font-size:var(--t-meta);line-height:1.7;color:var(--body);margin-bottom:.6rem;}
+.lc-trust p:last-child{margin-bottom:0;}
+.lc-trust a{color:var(--ink);text-decoration:underline;text-underline-offset:.18em;}
+.lc-trust--correction{border-top:2px solid var(--phil);}
+.lc-trust--correction h2,.lc-trust--correction h3{color:var(--phil);}
+.lc-trust .lc-when,.lc-trust time{
+  display:block;margin-bottom:.4rem;font-family:var(--sans);font-size:var(--t-label);
+  font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);
+}
+
+/* ============================================================
+   16. DOCUMENT PAGES
+   A page is not an article: it gets a contents column and reads
+   as a standing document rather than a story.
+   ============================================================ */
+.lc-doc-title{padding-bottom:clamp(1.4rem,3vw,2.1rem);border-bottom:1px solid var(--rule-strong);}
+.lc-doc-title .lc-label{margin-bottom:.85rem;}
+.lc-doc-title h1{
+  font-family:var(--serif);font-variation-settings:"opsz" 72,"wght" 340;
+  font-size:clamp(2rem,4.3vw,3rem);line-height:1.03;letter-spacing:-.026em;color:var(--ink);font-weight:400;
+}
+.lc-doc-title .lc-deck{margin-top:.9rem;max-width:38rem;font-size:var(--t-body);line-height:1.5;}
+
+/* post.hbs and page.hbs share the media figure, and the two want
+   different widths: a story centres it on the reading measure, a
+   document lines it up with the column of prose underneath it. */
+.lc-band > .lc-wrap > .lc-art-media{width:min(100%,var(--doc-measure));margin-inline:0;}
+
+.lc-doc{display:grid;grid-template-columns:minmax(0,14rem) minmax(0,1fr);gap:clamp(1.8rem,5vw,4.5rem);align-items:start;margin-top:clamp(1.8rem,3.4vw,2.5rem);}
+/* with one heading or none, or with no JavaScript, a document page
+   is a single column on purpose */
+.lc-doc.lc-no-toc{grid-template-columns:minmax(0,1fr);}
+.lc-doc.lc-no-toc .lc-doc-aside{display:none;}
+.lc-doc-aside{position:sticky;top:calc(var(--lc-dock-h) + 1.2rem);}
+.lc-doc-aside .lc-util{display:block;color:var(--dim);margin-bottom:.85rem;padding-bottom:.6rem;border-bottom:1px solid var(--hair);}
+.lc-toc{display:flex;flex-direction:column;gap:.5rem;}
+.lc-toc a{font-family:var(--sans);font-size:var(--t-meta);line-height:1.4;color:var(--dim);transition:color .18s ease;}
+.lc-toc a.is-current{color:var(--ink);}
+
+.lc-doc-main{max-width:var(--doc-measure);}
+/* A heading is a boundary. The rule that used to sit above every h2
+   said the same thing a second time, and About, Editorial standards and
+   Privacy are almost entirely h2s: those pages came out as a stack of
+   stripes with the copy between them. The section step in the spacing
+   scale does the work instead. */
+.lc-doc-main > h2{
+  margin:3.4rem 0 .9rem;scroll-margin-top:5rem;
+  font-family:var(--serif);font-variation-settings:"opsz" 30,"wght" 430;
+  font-size:var(--t-feature);line-height:1.2;letter-spacing:-.018em;color:var(--ink);font-weight:400;
+}
+.lc-doc-main > h2:first-child{margin-top:0;}
+.lc-doc-main h3{margin:1.55rem 0 .55rem;font-family:var(--sans);font-size:var(--t-label);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);}
+.lc-doc-main p{
+  margin-bottom:1rem;
+  font-family:var(--serif);font-variation-settings:"opsz" 16,"wght" 400;
+  font-size:var(--t-body);line-height:1.72;color:var(--body);text-wrap:pretty;
+}
+.lc-doc-main p:last-child{margin-bottom:0;}
+.lc-doc-main strong{color:var(--ink);font-weight:500;}
+.lc-doc-main a{color:var(--ink);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.18em;text-decoration-color:var(--accent);}
+/* An editorial list is not a table. Each entry already carries a
+   marker, a term in bold and a paragraph of its own, and it sat between
+   two hairlines as well: separated three times over, which reads as rows
+   in a spreadsheet rather than as a set of definitions. The marker and
+   the space stay; the rules go. */
+.lc-doc-main ul,.lc-doc-main ol{margin:0 0 1.6rem;padding:0;list-style:none;counter-reset:lc-dli;}
+.lc-doc-main li{
+  position:relative;padding-left:1.6rem;margin-bottom:1.35rem;
+  font-family:var(--serif);font-variation-settings:"opsz" 16,"wght" 400;
+  font-size:var(--t-body);line-height:1.62;color:var(--body);
+}
+.lc-doc-main li:last-child{margin-bottom:0;}
+.lc-doc-main ul > li::before{content:"";position:absolute;left:0;top:.66em;width:5px;height:5px;background:var(--accent);}
+.lc-doc-main ol > li{counter-increment:lc-dli;}
+.lc-doc-main ol > li::before{content:counter(lc-dli);position:absolute;left:0;top:.32em;font-family:var(--sans);font-size:var(--t-meta);color:var(--dim);}
+/* set on the blockquote itself: Ghost puts bare text inside one */
+.lc-doc-main blockquote{
+  margin:0 0 1.2rem;padding-left:1.3rem;border-left:1px solid var(--rule);
+  font-family:var(--serif);font-variation-settings:"opsz" 16,"wght" 400;
+  font-size:var(--t-compact);line-height:1.6;color:var(--dim);
+}
+.lc-doc-main blockquote p{font:inherit;color:inherit;margin:0 0 .8rem;}
+.lc-doc-main blockquote p:last-child{margin-bottom:0;}
+.lc-doc-main table{width:100%;border-collapse:collapse;margin-bottom:1.2rem;display:block;overflow-x:auto;}
+.lc-doc-main th,.lc-doc-main td{padding:.6rem .9rem .6rem 0;text-align:left;border-bottom:1px solid var(--hair);font-family:var(--sans);font-size:var(--t-meta);color:var(--body);}
+.lc-doc-main thead th{border-bottom-color:var(--rule-strong);color:var(--ink);font-weight:600;}
+.lc-doc-main tbody tr:last-child > *{border-bottom:0;}
+.lc-doc-main tbody th{font-weight:400;}
+.lc-doc-main hr{width:4.5rem;margin:2.4rem auto;border:0;border-top:1px solid var(--rule);}
+
+/* the two desks, side by side, for the About page */
+.lc-pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1.5rem clamp(1.5rem,3vw,2.5rem);margin:1.4rem 0;}
+.lc-pair-item{padding-top:1rem;border-top:2px solid var(--desk);}
+.lc-pair-item h3{margin:0 0 .4rem;font-family:var(--mono);font-size:var(--t-label);font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--desk);}
+.lc-pair-item .lc-q{margin:0 0 .5rem;font-family:var(--serif);font-style:italic;font-variation-settings:"opsz" 24,"wght" 330;font-size:var(--t-compact);color:var(--ink);}
+.lc-pair-item p{margin:0;font-family:var(--serif);font-variation-settings:"opsz" 16,"wght" 400;font-size:var(--t-compact);line-height:1.6;color:var(--body);}
+
+/* ============================================================
+   17. AUTHORS
+   ============================================================ */
+/* flex, not grid: two initials are two elements and must sit beside
+   each other, not stack into two rows */
+.lc-avatar{
+  width:3rem;height:3rem;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  background:var(--ink);color:var(--paper);
+  font-family:var(--serif);font-variation-settings:"opsz" 24,"wght" 400;font-size:var(--t-compact);
+}
+.lc-avatar img{width:100%;height:100%;object-fit:cover;}
+/* Initials without a helper: each name goes in at zero size and only
+   its first letter is given one back, so a two word name prints two
+   letters and nothing can render a broken image or an empty square. */
+.lc-avatar i{display:inline-block;font-size:0;font-style:normal;}
+.lc-avatar i::first-letter{font-size:var(--t-compact);text-transform:uppercase;}
+.lc-authorhead .lc-avatar i::first-letter{font-size:var(--t-feature);}
+.lc-authorcard{display:grid;grid-template-columns:auto minmax(0,1fr);gap:1.1rem;padding-top:1.25rem;border-top:1px solid var(--rule-strong);}
+/* The first author card owns the transition out of the story. A
+   second author is another name, not another transition. */
+.lc-authorcard + .lc-authorcard{margin-top:1.5rem;border-top-color:var(--hair);}
+.lc-authorcard .lc-nm{font-family:var(--serif);font-variation-settings:"opsz" 24,"wght" 450;font-size:var(--t-compact);color:var(--ink);letter-spacing:-.01em;}
+.lc-authorcard .lc-bio{margin-top:.55rem;font-family:var(--sans);font-size:var(--t-meta);line-height:1.65;color:var(--body);}
+.lc-authorcard .lc-arch{display:inline-block;margin-top:.55rem;font-family:var(--sans);font-size:var(--t-meta);font-weight:500;color:var(--dim);border-bottom:1px solid var(--hair);padding-bottom:.2rem;}
+
+.lc-authorhead{display:grid;grid-template-columns:auto minmax(0,1fr);gap:1.3rem;align-items:start;}
+.lc-authorhead .lc-avatar{width:4.5rem;height:4.5rem;font-size:var(--t-feature);}
+.lc-authorhead h1{
+  font-family:var(--serif);font-variation-settings:"opsz" 48,"wght" 400;
+  font-size:clamp(1.8rem,3.3vw,2.4rem);line-height:1.05;letter-spacing:-.022em;color:var(--ink);font-weight:400;
+}
+.lc-authorhead .lc-bio{
+  margin-top:.85rem;max-width:36rem;
+  font-family:var(--serif);font-variation-settings:"opsz" 16,"wght" 400;
+  font-size:var(--t-compact);line-height:1.65;color:var(--body);
+}
+.lc-authorhead .lc-links{margin-top:.7rem;display:flex;flex-wrap:wrap;gap:.5rem 1.1rem;font-family:var(--sans);font-size:var(--t-meta);color:var(--dim);}
+.lc-authorhead .lc-links a{border-bottom:1px solid var(--rule);}
+
+/* ============================================================
+   18. THE LATE LETTER
+   Correspondence from the editor, not a conversion card.
+   ============================================================ */
+.lc-letter{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(1.8rem,5vw,4.5rem);align-items:start;}
+.lc-letter-mark{display:inline-block;vertical-align:-.18em;margin-right:.7rem;color:var(--rule);}
+/* set exactly like the masthead, at a smaller scale */
+.lc-letter-mast{
+  display:block;
+  font-family:var(--serif);font-variation-settings:"opsz" 48,"wght" 360;
+  font-size:clamp(1.5rem,2.6vw,1.95rem);line-height:1;letter-spacing:-.03em;color:var(--ink);font-weight:400;
+}
+.lc-letter-mast i{color:var(--phil);font-style:normal;letter-spacing:0;}
+.lc-letter h2{
+  margin-top:1.05rem;
+  font-family:var(--serif);font-variation-settings:"opsz" 48,"wght" 330;
+  font-size:var(--t-feature);line-height:1.16;letter-spacing:-.02em;color:var(--ink);text-wrap:balance;font-weight:400;
+}
+.lc-letter p{
+  margin-top:1.05rem;
+  font-family:var(--serif);font-variation-settings:"opsz" 16,"wght" 400;
+  font-size:var(--t-body);line-height:1.68;color:var(--body);max-width:34rem;text-wrap:pretty;
+}
+.lc-letter .lc-sign{margin-top:1.5rem;padding-top:.9rem;border-top:1px solid var(--hair);display:inline-block;}
+.lc-letter .lc-sign em{
+  display:block;font-family:var(--serif);font-style:italic;
+  font-variation-settings:"opsz" 24,"wght" 400;font-size:var(--t-headline);color:var(--ink);
+}
+.lc-letter .lc-sign span{display:block;margin-top:.2rem;font-family:var(--sans);font-size:var(--t-meta);color:var(--dim);}
+
+.lc-letter-form{padding-top:.1rem;}
+.lc-letter-form .lc-ask{font-family:var(--sans);font-size:var(--t-meta);line-height:1.6;color:var(--dim);margin-bottom:.9rem;max-width:26rem;}
+.lc-letter-form form{display:flex;align-items:center;border-bottom:1px solid var(--rule-strong);}
+.lc-letter-form input[type="email"]{flex:1;min-width:0;background:none;border:0;padding:.8rem 0;font-family:var(--sans);font-size:var(--t-meta);color:var(--ink);}
+.lc-letter-form input::placeholder{color:var(--dim);}
+/* Chrome paints an autofilled field in its own pale yellow and sets the
+   text colour with it, which on the dark paper is a white block with
+   dark type in the middle of the letter. The colour cannot be set
+   directly; a background shadow the size of the field and a text fill
+   colour are the documented way to say what it should look like. */
+.lc-letter-form input:-webkit-autofill,
+.lc-letter-form input:-webkit-autofill:hover,
+.lc-letter-form input:-webkit-autofill:focus,
+.lc-password-form input:-webkit-autofill{
+  -webkit-text-fill-color:var(--ink);
+  -webkit-box-shadow:0 0 0 40px var(--paper) inset;
+  caret-color:var(--ink);
+}
+.lc-letter-form input:focus{outline:none;}
+.lc-letter-form form:focus-within{border-bottom-color:var(--accent);}
+.lc-letter-form button{
+  min-height:2.75rem;padding:.5rem 0 .5rem 1.25rem;font-family:var(--sans);
+  font-size:var(--t-label);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);
+  white-space:nowrap;
+}
+.lc-letter-form .lc-fine{margin-top:.75rem;font-family:var(--sans);font-size:var(--t-meta);line-height:1.5;color:var(--dim);}
+
+/* Ghost puts the state class on the form element itself. */
+.lc-letter-form form.loading button{opacity:.5;pointer-events:none;}
+.lc-letter-form form.error{border-bottom-color:var(--phil);}
+.lc-letter-form .lc-error-msg,
+.lc-letter-form .lc-error-fallback{margin-top:.55rem;font-family:var(--sans);font-size:var(--t-meta);line-height:1.5;color:var(--phil);}
+.lc-letter-form .lc-error-msg:empty{display:none;}
+/* shown only when the form failed, and only while Ghost has not
+   written a message of its own */
+.lc-letter-form .lc-error-fallback{display:none;}
+.lc-letter-form form.error ~ .lc-error-fallback{display:block;}
+.lc-letter-form .lc-error-msg:not(:empty) + .lc-error-fallback{display:none;}
+.lc-letter-form .lc-done{display:none;padding:.8rem 0;font-family:var(--sans);font-size:var(--t-meta);color:var(--ink);border-bottom:1px solid var(--accent);}
+.lc-letter-form form.success{display:none;}
+.lc-letter-form form.success ~ .lc-done{display:block;}
+.lc-letter-form form.success ~ .lc-fine,
+.lc-letter-form form.success ~ .lc-error-fallback{display:none;}
+
+.lc-letter-member{padding-top:.1rem;font-family:var(--sans);font-size:var(--t-meta);line-height:1.7;color:var(--dim);}
+.lc-letter-member a{color:var(--ink);border-bottom:1px solid var(--rule);}
+
+/* ============================================================
+   19. PAGINATION
+   ============================================================ */
+.lc-pager{
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  margin-top:clamp(2rem,4vw,3rem);padding-top:1.1rem;border-top:1px solid var(--rule);
+  font-family:var(--sans);font-size:var(--t-meta);color:var(--dim);font-variant-numeric:tabular-nums;
+}
+.lc-pager a{
+  display:inline-block;min-height:2.75rem;line-height:2.75rem;color:var(--ink);
+  border-bottom:1px solid var(--rule);transition:border-color .18s ease;
+}
+.lc-pager .lc-pager-where{text-align:center;}
+.lc-pager .lc-pager-gap{min-width:1px;}
+
+/* ============================================================
+   20. FOOTER
+   ============================================================ */
+.lc-foot{border-top:1px solid var(--rule-strong);padding:clamp(2.2rem,4.4vw,3.2rem) 0 2.4rem;}
+.lc-foot-grid{display:grid;grid-template-columns:minmax(0,1.7fr) repeat(4,minmax(0,1fr));gap:2rem clamp(1.25rem,2.6vw,2.5rem);}
+.lc-foot-mark{font-family:var(--serif);font-variation-settings:"opsz" 36,"wght" 380;font-size:var(--t-feature);letter-spacing:-.028em;line-height:1;color:var(--ink);text-transform:lowercase;}
+.lc-foot-mark i{color:var(--phil);font-style:normal;}
+.lc-foot-brand p{
+  margin-top:.8rem;max-width:21rem;
+  font-family:var(--serif);font-variation-settings:"opsz" 16,"wght" 400;
+  font-size:var(--t-compact);line-height:1.55;color:var(--dim);
+}
+.lc-foot-col h2{margin-bottom:.75rem;font-family:var(--sans);font-size:var(--t-label);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);}
+.lc-foot-col ul{display:flex;flex-direction:column;gap:.5rem;}
+.lc-foot-col a,.lc-foot-col li{font-family:var(--sans);font-size:var(--t-meta);color:var(--dim);}
+.lc-foot-col a{display:inline-block;transition:color .18s ease;}
+/* The copyright alone, on the publication's own left grid line. It was
+   a two item row justified apart; with one item that pushes it nowhere
+   and it simply reads as a line under the rule. */
+.lc-colophon{
+  margin-top:clamp(2.6rem,5.5vw,3.8rem);
+  font-family:var(--sans);font-size:var(--t-meta);line-height:1.55;color:var(--dim);
+}
+
+/* ============================================================
+   21. ERRORS AND EMPTY STATES
+   ============================================================ */
+.lc-error{padding:clamp(3rem,8vw,6rem) 0;}
+.lc-error-in{width:min(100%,var(--measure));}
+.lc-error .lc-label{margin-bottom:1rem;}
+.lc-error h1{
+  font-family:var(--serif);font-variation-settings:"opsz" 72,"wght" 340;
+  font-size:var(--t-h1);line-height:1.05;letter-spacing:-.026em;color:var(--ink);
+  text-wrap:balance;font-weight:400;
+}
+.lc-error p{
+  margin-top:1rem;font-family:var(--serif);font-variation-settings:"opsz" 18,"wght" 400;
+  font-size:var(--t-body);line-height:1.6;color:var(--body);
+}
+.lc-error .lc-back{
+  display:inline-block;margin-top:1.5rem;min-height:2.75rem;line-height:2.75rem;
+  font-family:var(--sans);font-size:var(--t-meta);font-weight:500;color:var(--ink);
+  border-bottom:1px solid var(--accent);
+}
+
+.lc-note-error{margin-top:1rem;font-family:var(--sans);font-size:var(--t-meta);color:var(--phil);}
+.lc-password-form{display:flex;align-items:center;max-width:26rem;margin-top:1.4rem;border-bottom:1px solid var(--rule-strong);}
+.lc-password-form input{flex:1;min-width:0;background:none;border:0;padding:.8rem 0;font-family:var(--sans);font-size:var(--t-meta);color:var(--ink);}
+.lc-password-form input:focus{outline:none;}
+.lc-password-form:focus-within{border-bottom-color:var(--accent);}
+.lc-password-form button{
+  min-height:2.75rem;padding:.5rem 0 .5rem 1.25rem;font-family:var(--sans);
+  font-size:var(--t-label);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);
+}
+
+/* Said once, quietly, where there is nothing to show yet. It never
+   stands in for journalism that does not exist. */
+.lc-empty{
+  width:min(100%,var(--measure));
+  font-family:var(--serif);font-variation-settings:"opsz" 24,"wght" 380;
+  font-size:var(--t-deck);line-height:1.55;color:var(--dim);text-wrap:pretty;
+}
+.lc-plate .lc-empty{color:var(--plate-dim);}
+.lc-plate-empty{padding-block:clamp(.5rem,2vw,1.5rem);}
+
+/* ============================================================
+   22. RESPONSIVE
+   Recomposed at each step, not shrunk.
+   ============================================================ */
+@media (max-width:1024px){
+  .lc-row-in{grid-template-columns:5rem minmax(0,1fr) 8rem;}
+  .lc-irow{grid-template-columns:2.5rem minmax(0,1fr) 8rem;}
+  .lc-foot-grid{grid-template-columns:minmax(0,1.4fr) repeat(2,minmax(0,1fr));}
+}
+@media (max-width:900px){
+  /* minmax(0,1fr) and never a bare 1fr: the minimum of a bare track is
+     its min-content, so one unbreakable child widens the whole column
+     past the screen. A subscribe button did exactly that at 320px. */
+  .lc-lead,.lc-deskfeature,.lc-story--feature,.lc-letter{grid-template-columns:minmax(0,1fr);}
+  .lc-lead .lc-media,.lc-deskfeature .lc-media{order:-1;}
+  .lc-story--feature .lc-media{order:-1;margin-bottom:.85rem;}
+  .lc-deskhead{grid-template-columns:minmax(0,1fr);}
+  .lc-desk-purpose{padding-bottom:0;}
+  .lc-letter{gap:2rem;}
+  .lc-doc{grid-template-columns:minmax(0,1fr);}
+  .lc-doc-aside{position:static;}
+  .lc-toc{flex-flow:row wrap;gap:.45rem 1.2rem;}
+}
+@media (max-width:760px){
+  /* Without JavaScript the links are simply a stacked list and the
+     Menu button is not offered, so a phone can always reach the
+     navigation. With it, the button takes over. */
+  .lc-nav{flex-wrap:wrap;}
+  /* The links are the last thing on the row, so opening the menu drops
+     them underneath and Menu and the theme control keep their places at
+     either end of it. Without this the expanded list wraps between the
+     two and carries the theme control down to the foot of the menu.
+     Order, not DOM: the button stays next to the list it controls. */
+  .lc-nav-links{order:1;display:flex;width:100%;flex-direction:column;border-top:1px solid var(--plate-hair);}
+  /* the row is the target, the word carries the marker */
+  .lc-nav-links a{width:100%;padding:.8rem 0;margin-right:0;}
+  :root[data-js="on"] .lc-nav-links{display:none;}
+  :root[data-js="on"] .lc-nav.is-open .lc-nav-links{display:flex;}
+  .lc-nav-menu{display:none;}
+  :root[data-js="on"] .lc-nav-menu{
+    display:inline-flex;align-items:center;gap:.6rem;min-height:2.75rem;padding:.5rem 0;
+    font-family:var(--sans);font-size:var(--t-meta);font-weight:500;color:var(--plate-dim);
+  }
+  .lc-nav-menu .lc-bars{display:flex;flex-direction:column;gap:3px;width:14px;}
+  .lc-nav-menu .lc-bars i{display:block;height:1px;background:currentColor;}
+  /* The dock is orientation, not branding. At a phone width the two
+     desk links and the context label give way before the wordmark and
+     the theme control do; the menu already reaches the desks. */
+  .lc-dock-nav,.lc-dock-where{display:none;}
+  /* :root[data-js="on"] carries the base rule, so a bare .lc-toggle
+     here loses to it on specificity and the control stayed 35px tall.
+     A thumb needs the whole 44. */
+  :root[data-js="on"] .lc-toggle{min-height:2.75rem;padding-inline:.8rem;}
+  :root[data-js="on"] .lc-dock .lc-toggle{min-height:2.75rem;}
+
+  .lc-week-support,.lc-week-briefs,.lc-rooms,.lc-pair{grid-template-columns:minmax(0,1fr);}
+  /* The vertical hairline between the columns has nothing to divide
+     once they stack, and a full width line on a phone is far louder
+     than the same line was between two desktop columns. Space. */
+  .lc-week-support > * + *,.lc-week-briefs > * + *{
+    padding-left:0;border-left:0;padding-top:0;margin-top:1.75rem;
+  }
+  .lc-room:first-child{padding-right:0;border-right:0;padding-bottom:2.2rem;}
+  .lc-room:last-child{padding-left:0;margin-top:2.2rem;}
+
+  /* the deck comes off the standard card so the hierarchy survives */
+  .lc-story--standard .lc-deck{display:none;}
+  .lc-story--standard{grid-template-columns:minmax(0,1fr) minmax(2.6rem,6rem);gap:1.1rem;}
+  .lc-story--compact,.lc-story--brief{grid-template-columns:minmax(0,1fr) minmax(2.2rem,4.75rem);gap:.9rem;}
+  .lc-story--row{grid-template-columns:minmax(0,1fr) minmax(2.2rem,4.75rem);gap:.9rem;}
+  .lc-row-in{grid-template-columns:minmax(0,1fr);gap:.28rem;}
+  .lc-story--row .lc-rmeta{text-align:left;}
+  .lc-story--row .lc-when{order:-1;}
+  .lc-story--index{grid-template-columns:minmax(0,1fr) minmax(2.6rem,6rem);gap:1.1rem;}
+  .lc-irow{grid-template-columns:minmax(0,1fr);gap:.32rem;}
+  .lc-folio{padding-top:0;}
+  .lc-irow .lc-rmeta{text-align:left;}
+  .lc-prose > p.lc-cap::first-letter{font-size:2.35em;}
+  .lc-foot-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
+  .lc-foot-brand{grid-column:1/-1;}
+  .lc-authorhead{grid-template-columns:minmax(0,1fr);gap:1rem;}
+
+  /* The byline wraps on a phone, and a separator drawn before an item
+     lands at the start of the new line as an orphan dot. Spacing and
+     the change of colour do the separating instead. */
+  .lc-art-meta{gap:.3rem 1.1rem;}
+  .lc-art-meta > * + *::before{content:none;}
+
+  /* Footer links are small type, which is right, but a link is a
+     target as well as a word. */
+  .lc-foot-col ul{gap:.15rem;}
+  .lc-foot-col a{padding-block:.55rem;}
+
+  /* The band rhythm is generous at desk widths and becomes a lot of
+     scrolling between headlines on a phone. Tightened, not cramped:
+     the rules still separate the modules. */
+  .lc-band{padding:clamp(1.9rem,7vw,2.6rem) 0;}
+}
+@media (max-width:430px){
+  :root{--t-label:.7813rem;--t-meta:.8438rem;}
+  .lc-foot-grid{grid-template-columns:minmax(0,1fr);}
+  .lc-authorcard{grid-template-columns:minmax(0,1fr);gap:.85rem;}
+  .lc-pager{flex-wrap:wrap;gap:.4rem 1rem;}
+}
+
+/* ============================================================
+   23. TOUCH, AND WHAT IOS DOES WITH IT
+   Everything here keys off the input device rather than the width,
+   because a 1024px tablet is a touch device and a 700px window on a
+   laptop is not.
+   ============================================================ */
+
+/* Safari zooms the whole page when a field smaller than 16px takes
+   focus, and then leaves the reader zoomed in on a form. The metadata
+   scale is right for the design and wrong for an input, so on a touch
+   device the field alone goes up to 16px. Nothing else changes. */
+@media (pointer:coarse),(max-width:760px){
+  .lc-letter-form input[type="email"],
+  .lc-password-form input,
+  .lc-prose input,
+  .lc-prose textarea{font-size:16px;}
+  .lc-letter-form button{padding-left:1rem;}
+  /* the keyboard comes up and the browser scrolls the field into view:
+     it should not arrive under the dock */
+  .lc-letter-form input,.lc-password-form input{scroll-margin-top:calc(var(--lc-dock-h) + 1.5rem);}
+}
+
+/* Hover is an enhancement, not information. On a touch screen a tap
+   leaves the hovered state stuck until something else is tapped, so
+   the treatments that change colour or draw a line are given only to
+   devices that can actually hover. The underline still grows on a
+   desktop; a phone simply shows the story. */
+@media (hover:hover) and (pointer:fine){
+  .lc-story:hover h2 span,.lc-story:hover h3 span{background-size:100% 1px;}
+  .lc-story:hover h2,.lc-story:hover h3{color:var(--desk,var(--accent));}
+  .lc-nav-links a:hover{color:var(--plate-ink);}
+  .lc-nav-links a:hover .lc-nav-label::after{transform:scaleX(1);}
+  .lc-room-more:hover{color:var(--desk);text-decoration-color:var(--desk);}
+  .lc-toggle:hover{border-color:var(--plate-dim);color:var(--plate-ink);}
+  .lc-dock-nav a:hover{color:var(--plate-ink);}
+  .lc-foot-col a:hover{color:var(--ink);}
+  .lc-topics a:hover{color:var(--ink);border-bottom-color:var(--ink);}
+  .lc-pager a:hover{border-bottom-color:var(--accent);}
+  .lc-readlink:hover{opacity:.68;}
+  .lc-authorcard .lc-arch:hover{color:var(--ink);border-bottom-color:var(--ink);}
+  .lc-prose a:hover{color:var(--desk,var(--accent));}
+  .lc-doc-main a:hover{opacity:.7;}
+  .lc-toc a:hover{color:var(--ink);}
+  .lc-mediacap a:hover{color:var(--ink);}
+  .lc-art-meta .lc-by a:hover{border-bottom-color:var(--ink);}
+  .lc-prose .kg-bookmark-container:hover,.lc-doc-main .kg-bookmark-container:hover{border-color:var(--desk,var(--accent));}
+  .lc-prose .kg-btn:hover,.lc-doc-main .kg-btn:hover{background:var(--ink);color:var(--paper);}
+  .lc-prose .kg-btn-accent:hover,.lc-doc-main .kg-btn-accent:hover{opacity:.82;}
+  .lc-authorhead .lc-links a:hover{color:var(--ink);border-bottom-color:var(--ink);}
+  .lc-letter-member a:hover{border-bottom-color:var(--ink);}
+  .lc-error .lc-back:hover{opacity:.7;}
+  .lc-prose .kg-button-card a.kg-btn:hover,.lc-doc-main .kg-button-card a.kg-btn:hover{background:var(--ink);color:var(--paper);opacity:1;}
+}
+
+/* Restrained tap feedback on controls, and nowhere near the prose. */
+@media (pointer:coarse){
+  .lc-toggle,.lc-nav-menu,.lc-pager a,.lc-room-more,.lc-readlink,
+  .lc-letter-form button,.lc-password-form button,.lc-foot-col a,
+  .lc-error .lc-back{touch-action:manipulation;}
+  .lc-story:active h2,.lc-story:active h3{color:var(--desk,var(--accent));}
+  .lc-toggle:active,.lc-nav-menu:active{opacity:.7;}
+}
+
+/* A heading reached from a link must clear the dock, which is the only
+   thing that can be covering it. A modest constant, not a guess at
+   whether the dock happens to be up. */
+.lc-prose h2,.lc-prose h3,
+.lc-doc-main > h2,.lc-doc-main > h3,
+.lc-trust h2,
+[id]:target{scroll-margin-top:calc(var(--lc-dock-h) + 1rem);}
+
+/* ============================================================
+   24. PRINT
+   ============================================================ */
+@media print{
+  body{background:#fff;color:#000;}
+  .lc-plate{background:#fff;color:#000;border-bottom:1px solid #000;}
+  .lc-wordmark,.lc-plate a{color:#000;}
+  .lc-dock,.lc-progress,.lc-nav,.lc-slug,.lc-toggle,.lc-skip,
+  .lc-letter-form,.lc-related,.lc-topics,.lc-foot-col,.lc-thumb,
+  .lc-doc-aside,.lc-pager,canvas{display:none!important;}
+  .lc-art-head h1,.lc-prose > p,.lc-prose li,.lc-doc-main p{color:#000;}
+  .lc-prose,.lc-art-head,.lc-doc-main{width:100%;max-width:none;}
+  .lc-prose a{text-decoration:underline;color:#000;}
+  .lc-prose a[href^="http"]::after{content:" (" attr(href) ")";font-size:.75em;word-break:break-all;}
+  .lc-article{padding:0;}
+}

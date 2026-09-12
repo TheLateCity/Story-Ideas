@@ -1,0 +1,49 @@
+{{!-- The publication plate.
+
+     Three densities, set by the template rather than by JavaScript:
+       full     the front page, with the masthead and the lead story
+       medium   a desk, with its name, its question and its feature
+       compact  a story, a document, an author, an error
+
+     The plate body is filled by whichever template is rendering, so
+     nothing prints an empty black band. --}}
+
+<header class="lc-plate" data-chrome="{{block "chrome"}}" data-desk="{{block "desk"}}">
+    <div class="lc-wrap">
+
+        {{!-- The dateline, and nothing else. The letter is reached from
+              the front page and the footer, where it is an editorial
+              destination rather than a utility link. --}}
+        <div class="lc-slug lc-util">{{date format="dddd, D MMMM YYYY"}}</div>
+
+        <div class="lc-mastrow">
+            <a class="lc-wordmark" href="{{@site.url}}">{{@site.title}}<i>.</i></a>
+            {{#is "home"}}
+                {{#if @custom.masthead_note}}<p class="lc-mast-note">{{@custom.masthead_note}}</p>{{/if}}
+            {{/is}}
+        </div>
+
+        <nav class="lc-nav" data-lc-nav data-lc-dock-after aria-label="Primary">
+            <button class="lc-nav-menu" type="button" data-lc-nav-toggle aria-expanded="false" aria-controls="lc-nav-links">
+                <span class="lc-bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Menu</span>
+            </button>
+
+            {{#if @site.navigation}}
+                {{navigation}}
+            {{else}}
+                {{> "navigation-fallback"}}
+            {{/if}}
+
+            <div class="lc-nav-end">{{> "theme-toggle"}}</div>
+        </nav>
+    </div>
+
+    {{{block "plate"}}}
+
+    {{!-- The dock is marked on the navigation, not on the header: the
+          dock IS the navigation, compacted, and it takes over at the
+          moment the real one leaves the top of the screen. Nothing
+          depends on a height, which changes with the viewport, the
+          wrapping of the masthead note, the open state of the menu,
+          font loading and rotation. --}}
+</header>

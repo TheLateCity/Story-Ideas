@@ -1,0 +1,13 @@
+{{!-- Ghost renders this in place of {{pagination}}, with the
+      pagination object as the context, which is why page and pages
+      are read directly here and never anywhere else.
+
+      One page of results needs no pager, so nothing prints. --}}
+
+{{#match pages ">" 1}}
+<nav class="lc-pager" aria-label="Pagination">
+    {{#if prev}}<a href="{{page_url prev}}" rel="prev">Newer</a>{{else}}<span class="lc-pager-gap"></span>{{/if}}
+    <span class="lc-pager-where">Page {{page}} of {{pages}}</span>
+    {{#if next}}<a href="{{page_url next}}" rel="next">Older</a>{{else}}<span class="lc-pager-gap"></span>{{/if}}
+</nav>
+{{/match}}

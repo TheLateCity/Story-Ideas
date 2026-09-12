@@ -1,0 +1,39 @@
+{{!< default}}
+
+{{!-- A TOPIC
+
+     AI, Housing, Privacy, Procurement and the rest. Topics run
+     through both desks and are not desks: they get the compact
+     chrome and no plate, so they never compete with Technology and
+     Philosophy.
+
+     Everything is read as {{tag.x}} rather than inside {{#tag}}.
+     That block changes the context, and pagination read inside it
+     makes Ghost answer the whole page with a 400. --}}
+
+{{#contentFor "chrome"}}compact{{/contentFor}}
+{{#contentFor "where"}}{{tag.name}}{{/contentFor}}
+
+<section class="lc-band">
+    <div class="lc-wrap">
+
+        <div class="lc-band-head">
+            <h1>{{tag.name}}</h1>
+            <span class="lc-note">{{plural pagination.total empty="No stories yet" singular="% story" plural="% stories"}}</span>
+        </div>
+
+        {{#if tag.description}}<p class="lc-rooms-intro">{{tag.description}}</p>{{/if}}
+
+        {{#if posts}}
+            <div class="lc-index" data-lc-folios data-page="{{pagination.page}}" data-limit="{{pagination.limit}}">
+                {{#foreach posts}}{{> "story" variant="index" heading="2"}}{{/foreach}}
+            </div>
+        {{else}}
+            {{!-- Ghost answers a tag with no published posts with a 404,
+                  so this is a guard rather than a page anyone reaches. --}}
+            <p class="lc-empty">Nothing has been filed under this topic yet.</p>
+        {{/if}}
+
+        {{pagination}}
+    </div>
+</section>

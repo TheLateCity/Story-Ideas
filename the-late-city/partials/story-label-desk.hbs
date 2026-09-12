@@ -1,0 +1,23 @@
+{{!-- TYPE / TOPIC, for use inside a desk.
+
+     Once a reader is plainly inside Technology, repeating TECHNOLOGY
+     on every card tells them nothing. The desk drops away and the type
+     takes the front of the label. Neither half is emphasised, because
+     the coloured half of a label is the desk, and the desk is exactly
+     what has been established.
+
+     Both desks are skipped, so a story tagged Technology and then
+     Philosophy does not read as though Philosophy were its type.
+
+     There is no wrapper element. foreach cannot stop at the first
+     match, so each eligible tag prints its own label and CSS keeps the
+     first two; a wrapper would have to be printed before anything was
+     known about what goes in it, and a story carrying only a desk tag
+     would then leave an empty label in the markup for a screen reader
+     to find. Printing nothing is better than hiding something. --}}
+
+{{~#foreach tags from="2"~}}
+{{~#match slug "!=" "technology"~}}
+{{~#match slug "!=" "philosophy"~}}<span class="lc-label lc-label--desk">{{name}}</span>{{~/match~}}
+{{~/match~}}
+{{~/foreach~}}

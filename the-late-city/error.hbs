@@ -1,0 +1,18 @@
+{{!< default}}
+
+{{!-- Every error that is not a 404. Ghost supplies the code and the
+      message; the theme does not guess at either. --}}
+
+{{#contentFor "chrome"}}compact{{/contentFor}}
+{{#contentFor "where"}}Error{{/contentFor}}
+
+<section class="lc-error">
+    <div class="lc-wrap">
+        <div class="lc-error-in">
+            <span class="lc-label"><b>{{@site.title}}</b><span class="lc-div" aria-hidden="true">/</span>{{error.statusCode}}</span>
+            <h1>{{error.message}}</h1>
+            <p>Something on our side did not answer. The front page is the shortest way back to the journalism.</p>
+            <a class="lc-back" href="{{@site.url}}/">Return to the front page</a>
+        </div>
+    </div>
+</section>

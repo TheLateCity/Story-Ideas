@@ -1,0 +1,23 @@
+{{!-- One of the two desks on the front page.
+
+     Called with the desk already known to have published something,
+     so this never prints an empty room:
+
+       {{> "room" deskSlug=slug deskName=name deskUrl=url}}
+
+     Inside a desk the section is established, so the cards drop it
+     and lead with the type instead. --}}
+
+<section class="lc-room" data-desk="{{deskSlug}}" aria-labelledby="lc-room-{{deskSlug}}">
+    <div class="lc-room-top">
+        <h3 class="lc-room-name" id="lc-room-{{deskSlug}}">{{deskName}}</h3>
+    </div>
+    <p class="lc-room-q">{{> "desk-question" slug=deskSlug}}</p>
+
+    {{#get "posts" filter="tag:{{deskSlug}}" limit="3" include="authors,tags"}}
+        {{#foreach posts limit="1"}}{{> "story" variant="standard" label="desk"}}{{/foreach}}
+        {{#foreach posts from="2" to="3"}}{{> "story" variant="compact" label="desk"}}{{/foreach}}
+    {{/get}}
+
+    <a class="lc-room-more" href="{{deskUrl}}">All {{deskName}}</a>
+</section>

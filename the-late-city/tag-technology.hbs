@@ -1,0 +1,16 @@
+{{!< default}}
+
+{{!-- TECHNOLOGY: what are we building?
+
+     Ghost selects this automatically for the tag slug "technology".
+     A desk is not a topic: it gets the medium chrome, its own plate,
+     its question and a current feature. Everything specific to this
+     desk lives in the desk partials, so the two desks cannot drift
+     apart. --}}
+
+{{#contentFor "chrome"}}medium{{/contentFor}}
+{{#contentFor "desk"}}{{tag.slug}}{{/contentFor}}
+{{#contentFor "where"}}{{tag.name}}{{/contentFor}}
+{{#contentFor "plate"}}{{#tag}}{{> "desk-plate"}}{{/tag}}{{/contentFor}}
+
+{{> "desk-archive"}}

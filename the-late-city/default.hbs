@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="{{@site.locale}}" data-section="{{block "desk"}}">
+<head>
+    <meta charset="utf-8">
+    {{!-- viewport-fit=cover so the plate reaches the edges of a notched
+          phone; the layout takes the insets back through --lc-edge.
+          Zoom is never disabled: no maximum-scale, no user-scalable. --}}
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    {{!-- The browser's own chrome matches the plate rather than sitting
+          as a white band above it. Declared per scheme so it is right
+          on the first paint and never has to change. --}}
+    <meta name="theme-color" content="#0E0E11" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <title>{{meta_title}}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..400&display=swap">
+
+    <link rel="stylesheet" type="text/css" href="{{asset "css/screen.css"}}">
+
+    {{!-- Applied before first paint, so a reader who chose dark never
+          sees a white flash on the way in. --}}
+    <script>
+        (function () {
+            var root = document.documentElement;
+            root.setAttribute('data-js', 'on');
+            try {
+                var t = localStorage.getItem('lc-theme');
+                if (t === 'dark' || t === 'light') root.setAttribute('data-theme', t);
+            } catch (e) {}
+        })();
+    </script>
+
+    {{ghost_head}}
+</head>
+
+<body class="{{body_class}}">
+
+    <a class="lc-skip" href="#lc-main">Skip to content</a>
+
+    {{{block "progress"}}}
+
+    <div class="lc-dock" data-lc-dock data-desk="{{block "desk"}}">
+        <div class="lc-wrap lc-dock-in">
+            <div class="lc-dock-l">
+                <a class="lc-dock-mark" href="{{@site.url}}">the late city<i>.</i></a>
+                <span class="lc-dock-where lc-util">{{block "where"}}</span>
+            </div>
+            <div class="lc-dock-end">
+                {{> "desk-links"}}
+                {{> "theme-toggle"}}
+            </div>
+        </div>
+    </div>
+
+    {{> "site-header"}}
+
+    <main id="lc-main" tabindex="-1">
+        {{{body}}}
+    </main>
+
+    {{> "site-footer"}}
+
+    {{ghost_foot}}
+    <script src="{{asset "js/main.js"}}" defer></script>
+</body>
+</html>

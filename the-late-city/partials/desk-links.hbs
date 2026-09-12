@@ -1,0 +1,22 @@
+{{!-- The two desks in the dock, read off the site's own navigation
+      so no extra query runs on every page. Two passes, so Technology
+      is always first whatever order the menu is in.
+
+      {{this.url}} and not {{url}}, and the difference is not cosmetic.
+      url is a Ghost helper as well as a property name. As a bare
+      mustache it calls the helper, which returns the URL of the
+      resource in context; a navigation item is a plain object and not
+      a resource, so the helper falls through to the current page and
+      every desk link in the dock pointed at whatever page the reader
+      was already on. Written as a path expression it reads the
+      property, which is what is wanted.
+
+      It works by accident in the footer, where the loop is over real
+      tags and the helper happens to return the tag's own URL. --}}
+
+{{#if @site.navigation}}
+<nav class="lc-dock-nav" aria-label="Desks">
+    {{#foreach @site.navigation}}{{#match this.url "~$" "/technology/"}}<a href="{{this.url}}" data-desk="technology">{{this.label}}</a>{{/match}}{{/foreach}}
+    {{#foreach @site.navigation}}{{#match this.url "~$" "/philosophy/"}}<a href="{{this.url}}" data-desk="philosophy">{{this.label}}</a>{{/match}}{{/foreach}}
+</nav>
+{{/if}}

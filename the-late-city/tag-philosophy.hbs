@@ -1,0 +1,14 @@
+{{!< default}}
+
+{{!-- PHILOSOPHY: what is it doing to us?
+
+     Ghost selects this automatically for the tag slug "philosophy".
+     The mirror of tag-technology.hbs: same structure, same partials,
+     the other room. Its accent is the publication's red. --}}
+
+{{#contentFor "chrome"}}medium{{/contentFor}}
+{{#contentFor "desk"}}{{tag.slug}}{{/contentFor}}
+{{#contentFor "where"}}{{tag.name}}{{/contentFor}}
+{{#contentFor "plate"}}{{#tag}}{{> "desk-plate"}}{{/tag}}{{/contentFor}}
+
+{{> "desk-archive"}}

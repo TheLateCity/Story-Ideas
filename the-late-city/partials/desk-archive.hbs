@@ -1,0 +1,26 @@
+{{!-- Everything a desk has published, under its plate.
+
+      Shared by tag-technology.hbs and tag-philosophy.hbs, which
+      differ only in which tag Ghost hands them. The label on each
+      card drops the desk and leads with the type: the reader already
+      knows which room they are standing in. --}}
+
+<section class="lc-band" data-desk="{{tag.slug}}">
+    <div class="lc-wrap">
+
+        <div class="lc-band-head">
+            <h2>Everything in {{tag.name}}</h2>
+            <span class="lc-note">{{plural pagination.total empty="Nothing published yet" singular="% story" plural="% stories"}}</span>
+        </div>
+
+        {{#if posts}}
+            <div class="lc-index" data-lc-folios data-page="{{pagination.page}}" data-limit="{{pagination.limit}}">
+                {{#foreach posts}}{{> "story" variant="index"}}{{/foreach}}
+            </div>
+        {{else}}
+            <p class="lc-empty">This desk is open and its first stories are being reported.</p>
+        {{/if}}
+
+        {{pagination}}
+    </div>
+</section>

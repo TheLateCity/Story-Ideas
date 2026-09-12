@@ -1,0 +1,25 @@
+{{!-- The lead story, inside the plate.
+
+     Not a card: the copy and the picture are balanced against each
+     other, and the only decoration is the desk coloured rule under
+     the read link. Its picture is the one image on the front page
+     that must not wait for the reader to scroll. --}}
+
+<div class="lc-lead"{{#if primary_tag}} data-desk="{{primary_tag.slug}}"{{/if}}>
+    <div>
+        {{> "story-label"}}
+        <h1><a href="{{url}}">{{title}}</a></h1>
+        {{#if excerpt}}<p class="lc-deck">{{excerpt words="40"}}</p>{{/if}}
+        <div class="lc-byline">
+            <span class="lc-who">{{authors autolink="false"}}</span>
+            <span class="lc-sep" aria-hidden="true"></span>
+            <time datetime="{{date format="YYYY-MM-DD"}}">{{date format="D MMMM YYYY"}}</time>
+            {{#if @custom.show_reading_time}}
+                <span class="lc-sep" aria-hidden="true"></span>
+                <span class="lc-dur">{{reading_time}}</span>
+            {{/if}}
+        </div>
+        <a class="lc-readlink" href="{{url}}">Read this story</a>
+    </div>
+    <figure class="lc-media">{{> "story-image" sizes="(max-width: 900px) 92vw, 520px" eager=true}}</figure>
+</div>

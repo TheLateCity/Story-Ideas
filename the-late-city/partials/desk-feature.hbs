@@ -1,0 +1,18 @@
+{{!-- The story that gives a desk its plate. Called from inside a
+      {{#foreach posts}}, so the context is the post. --}}
+
+<a class="lc-deskfeature" href="{{url}}">
+    <div>
+        {{> "story-label"}}
+        <h2>{{title}}</h2>
+        {{#if excerpt}}<p class="lc-deck">{{excerpt words="34"}}</p>{{/if}}
+        <div class="lc-byline">
+            <span class="lc-who">{{authors autolink="false"}}</span>
+            {{#if @custom.show_reading_time}}
+                <span class="lc-sep" aria-hidden="true"></span>
+                <span class="lc-dur">{{reading_time}}</span>
+            {{/if}}
+        </div>
+    </div>
+    <figure class="lc-media">{{> "story-image" sizes="(max-width: 900px) 92vw, 520px" eager=true}}</figure>
+</a>

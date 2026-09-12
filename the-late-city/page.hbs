@@ -1,0 +1,63 @@
+{{!< default}}
+
+{{!-- A DOCUMENT
+
+     About, Editorial standards, Privacy, Terms and Contact are not
+     articles. They get a document layout with a contents column
+     built from the page's own headings.
+
+     The theme controls presentation. Ghost controls the words: none
+     of the copy on these pages lives here. --}}
+
+{{#page}}
+
+{{#contentFor "chrome"}}compact{{/contentFor}}
+{{#contentFor "where"}}{{title}}{{/contentFor}}
+
+<section class="lc-band">
+    <div class="lc-wrap">
+
+        {{!-- The editor can turn the title and the feature image off for
+              a page whose content supplies its own opening.
+
+              Tested for "not false" rather than for truth: the setting
+              is a Ghost 6 addition, and on Ghost 5 it is undefined, so
+              {{#if}} would hide the title of every page on the older
+              version. Undefined is not false, so the title stays. --}}
+        {{#match @page.show_title_and_feature_image "!=" false}}
+            <div class="lc-doc-title">
+                <span class="lc-label">The publication</span>
+                <h1>{{title}}</h1>
+                {{#if custom_excerpt}}<p class="lc-deck">{{custom_excerpt}}</p>{{/if}}
+            </div>
+
+            {{#if feature_image}}
+            <figure class="lc-art-media lc-media">
+                <span class="lc-frame">{{> "responsive-image" src=feature_image alt=feature_image_alt sizes="(max-width: 900px) 92vw, 1160px" eager=true}}</span>
+                {{#if feature_image_caption}}<figcaption class="lc-mediacap">{{{feature_image_caption}}}</figcaption>{{/if}}
+            </figure>
+            {{/if}}
+        {{/match}}
+
+        {{!-- Starts as a single column and JavaScript lifts it into two
+              when the page has enough headings to be worth navigating.
+              With one heading, or none, or with scripting off, one
+              column is the right answer rather than a failure. --}}
+        <div class="lc-doc lc-no-toc" data-lc-doc>
+            {{!-- A div, not an aside. The navigation inside it is
+                  already a landmark with a name; wrapping it in a
+                  complementary landmark as well announced the contents
+                  column twice and put a region inside the article. --}}
+            <div class="lc-doc-aside">
+                <span class="lc-util">Contents</span>
+                <nav class="lc-toc" data-lc-toc aria-label="On this page"></nav>
+            </div>
+
+            <div class="lc-doc-main" data-lc-doc-main>
+                {{content}}
+            </div>
+        </div>
+    </div>
+</section>
+
+{{/page}}

@@ -1,0 +1,41 @@
+{{!-- A desk, on the plate: its name, its question, what it is for,
+      and the story currently standing for it.
+
+      Call from inside {{#tag}}. The feature prefers a featured post
+      from this desk and falls back to the most recent one. A desk
+      with nothing published keeps its name, its question and its
+      purpose, and says so plainly rather than printing a broken
+      grid or a count of zero. --}}
+
+<div class="lc-wrap lc-plate-body" data-desk="{{slug}}">
+
+    <div class="lc-deskhead">
+        <div>
+            <h1>{{name}}</h1>
+            <p class="lc-desk-q">{{> "desk-question"}}</p>
+        </div>
+        <p class="lc-desk-purpose">{{#if description}}{{description}}{{else}}{{> "desk-purpose"}}{{/if}}</p>
+    </div>
+
+    {{!-- One query, ordered, rather than a featured query with a fallback
+          inside it. Two reasons, both learned the hard way.
+
+          The {{else}} of {{#get}} does not fire on an empty result set,
+          so a fallback written there never runs. And a {{#get}} nested
+          inside another one is evaluated in the outer query's context,
+          where {{slug}} does not exist: the inner filter came out as
+          "tag:" and Ghost returned nothing at all, so a desk with
+          nothing featured showed neither a feature nor an empty state.
+
+          Ordering featured first and published_at second says the same
+          thing in one query that cannot go wrong: the featured story if
+          there is one, otherwise the most recent. --}}
+    {{#get "posts" filter="tag:{{slug}}" limit="1" order="featured desc, published_at desc" include="authors,tags"}}
+        {{#if posts}}
+            {{#foreach posts}}{{> "desk-feature"}}{{/foreach}}
+        {{else}}
+            <p class="lc-empty lc-plate-empty">Stories from this desk are forthcoming.</p>
+        {{/if}}
+    {{/get}}
+
+</div>
