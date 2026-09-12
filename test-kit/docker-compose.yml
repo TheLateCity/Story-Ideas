@@ -1,0 +1,33 @@
+# The Late City — local Ghost for theme testing.
+#
+#   docker compose up -d      start Ghost on http://localhost:2368
+#   docker compose down       stop it (content is kept in the volume)
+#   docker compose down -v    stop it and throw the content away
+#
+# SQLite is used deliberately: this is a disposable test site, not a
+# publication. Content lives in a named Docker volume rather than a
+# Windows folder, because a bind mount hands Ghost a directory it cannot
+# chown and the container exits before it finishes booting.
+
+services:
+  ghost:
+    image: ghost:6-alpine
+    container_name: latecity-ghost
+    restart: unless-stopped
+    ports:
+      - "2368:2368"
+    environment:
+      # development, so Ghost is happy on SQLite and serves unminified
+      # assets. Theme rendering is identical either way.
+      NODE_ENV: development
+      url: http://localhost:2368
+      database__client: sqlite3
+      database__connection__filename: /var/lib/ghost/content/data/ghost.db
+      database__useNullAsDefault: "true"
+      # no outbound mail from a test box
+      mail__transport: Direct
+    volumes:
+      - ghost-content:/var/lib/ghost/content
+
+volumes:
+  ghost-content:
